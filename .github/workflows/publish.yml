@@ -20,9 +20,13 @@ on:
       - '.tesslignore'
   workflow_dispatch:
 
-# as-is publish makes no commit/push and uses no OIDC — least privilege.
+# Must grant at least what the reusable workflow declares (contents: write,
+# id-token: write). A called workflow cannot exceed the caller's grant, and
+# capping this at `contents: read` fails the whole run at startup before any
+# job begins — no logs, no jobs, just a red run.
 permissions:
-  contents: read
+  contents: write
+  id-token: write
 
 jobs:
   publish:
