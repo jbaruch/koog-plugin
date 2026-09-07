@@ -79,6 +79,33 @@ compiling, not by reading release notes.
 - `migrate-from-0-x` told readers to set every `ai.koog:*` artifact to one version
   string, which cannot work across two version lines
 
+### Evals
+
+Partial run — **20 of 50 scenarios**, on the publish-time default solver
+`claude:deepseek-v4-flash`. The workspace ran out of credit mid-run, so this is a
+subset, not a suite result, and it is not comparable to the whole-suite numbers in
+earlier releases.
+
+- **75% with the plugin against 34% without**, across the 20 scenarios that scored both
+  arms. Mean rubric points 14.0 against 5.4, mean lift **+8.6**
+- Largest lifts land where the plugin does its actual work — routing a request to the
+  right primitive: `persist-chat-history-refuses-fact-store` +25,
+  `persist-chat-history-jdbc` +20, `use-llm-node-variants-streaming` +20,
+  `snapshot-and-restore-refuses-crash` +19
+- Near-zero lift on stable-API scenarios (`add-observability-langfuse`,
+  `manage-state-tldr-mid-phase`, both +0) is the expected shape: a competent model
+  already writes correct Koog for APIs that did not change. Not a scenario defect
+- Two negatives, `migrate-from-0-x-agentmemory-removal` −14 and
+  `use-attachments-image-input` −11, both with a plugin-arm score of 0. That is the
+  signature of the harness stub failure (solution directory left pristine), not a
+  regression. Re-run before reading anything into them
+
+**The three scenarios added in this release are unmeasured.**
+`use-agent-skills-runtime-catalog` and `use-cli-agents-cross-vendor-critic` never scored
+either arm; `use-cli-agents-refuses-plain-llm-call` scored 20/20 on the plugin arm but
+its baseline never ran, so there is no lift figure. 0.5.0's new surface has not been
+evaluated — treat the headline as covering the pre-existing skills only.
+
 ### Manifest and terminology
 
 - Migrated `tile.json` to `.tessl-plugin/plugin.json` via `tessl plugin migrate`. The
