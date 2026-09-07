@@ -1,7 +1,7 @@
 ---
 name: use-functional-agent
 description: >
-  Use `FunctionalAIAgent` — the third concrete agent subtype in Koog 1.0 (alongside
+  Use `FunctionalAIAgent` — the third concrete agent subtype in Koog 1.2 (alongside
   `GraphAIAgent` and `PlannerAIAgent`). Wraps a single suspending block, no graph DSL,
   no planner — just programmer-written logic that calls the LLM and tools directly.
   Use when the user asks to "skip the graph DSL", "write the agent body as plain code",

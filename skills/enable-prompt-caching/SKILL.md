@@ -1,7 +1,7 @@
 ---
 name: enable-prompt-caching
 description: >
-  Enable Anthropic prompt caching for a Koog 1.0 agent — automatic caching is on by
+  Enable Anthropic prompt caching for a Koog 1.2 agent — automatic caching is on by
   default in 1.0, but explicit `cacheControl` breakpoints let you control which parts
   of long prompts get cached. Surfaces cache-hit metrics through the OpenTelemetry
   token-usage span. Use when the user asks to "enable prompt caching", "reduce
@@ -15,7 +15,7 @@ Process steps in order. Do not skip ahead.
 
 ## Step 1 — Confirm the Provider
 
-Prompt caching, as covered here, is the **Anthropic** caching feature (cache breakpoints in the messages API; cache hits billed at reduced rates). Koog 1.0 enables automatic caching when calling Anthropic models.
+Prompt caching, as covered here, is the **Anthropic** caching feature (cache breakpoints in the messages API; cache hits billed at reduced rates). Koog 1.2 enables automatic caching when calling Anthropic models.
 
 If the user is on OpenAI, Google, or another provider, redirect:
 
@@ -26,7 +26,7 @@ If the user is on Anthropic, proceed to Step 2.
 
 ## Step 2 — Automatic Caching (Already On)
 
-Koog 1.0 turned on automatic Anthropic prompt caching by default. Long system prompts and repeated tool definitions are cached without code changes.
+Koog 1.2 turned on automatic Anthropic prompt caching by default. Long system prompts and repeated tool definitions are cached without code changes.
 
 To verify it's working, check the token-usage span attributes after a few runs:
 

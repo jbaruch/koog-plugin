@@ -1,7 +1,7 @@
 ---
 name: add-token-budgeting
 description: >
-  Add token-budgeting and per-provider tokenizer support to a Koog 1.0 agent —
+  Add token-budgeting and per-provider tokenizer support to a Koog 1.2 agent —
   install the tokenizer feature, set per-run or per-node budgets, and react to budget
   exhaustion (compress history, abort, swap models). Use when the user asks to "limit
   tokens per run", "add a token budget", "prevent runaway agent costs", "use a
@@ -15,8 +15,8 @@ Process steps in order. Do not skip ahead.
 ## Step 1 — Add the Dependencies
 
 ```kotlin
-implementation("ai.koog:agents-features-tokenizer:1.0.0")
-implementation("ai.koog:prompt-tokenizer:1.0.0")    // provider tokenizers
+implementation("ai.koog:agents-features-tokenizer:1.2.0")
+implementation("ai.koog:prompt-tokenizer:1.2.0")    // provider tokenizers
 ```
 
 The `prompt-tokenizer` module ships tokenizers for the major providers — they compute token counts before the LLM call, which is what the budgeting feature uses to gate requests.

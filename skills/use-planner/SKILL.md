@@ -1,7 +1,7 @@
 ---
 name: use-planner
 description: >
-  Pick and wire a planner-driven Koog 1.0 agent — either LLM-based (the LLM picks the
+  Pick and wire a planner-driven Koog 1.2 agent — either LLM-based (the LLM picks the
   next action each turn, optionally with a critic loop) or GOAP (a classical planner
   searches a typed state space toward a goal). Pulls `ai.koog:agents-planner`, constructs
   the planner strategy, and wires it into `AIAgent(...)`. Use when the user asks to
@@ -56,7 +56,7 @@ Proceed to Step 2 for LLM-based, Step 3 for GOAP. This handoff applies only when
 Add the planner module to `build.gradle.kts`:
 
 ```kotlin
-implementation("ai.koog:agents-planner:1.0.0")
+implementation("ai.koog:agents-planner:1.2.0-beta")
 ```
 
 Construct the planner strategy and wire into `AIAgent(...)`:
@@ -99,7 +99,7 @@ GOAP needs a **typed, serializable state class** and a set of actions defined as
 Add the planner module:
 
 ```kotlin
-implementation("ai.koog:agents-planner:1.0.0")
+implementation("ai.koog:agents-planner:1.2.0-beta")
 ```
 
 Define the state and the planner:

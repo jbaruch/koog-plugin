@@ -2,7 +2,7 @@
 
 [![tessl](https://img.shields.io/endpoint?url=https%3A%2F%2Fapi.tessl.io%2Fv1%2Fbadges%2Fjbaruch%2Fkoog)](https://tessl.io/registry/jbaruch/koog)
 
-Koog 1.0 idioms, gotchas, and skills for Kotlin agents on the JVM.
+Koog 1.2 idioms, gotchas, and skills for Kotlin agents on the JVM.
 
 Koog reached 1.0 on 2026-05-21. The published documentation at `docs.koog.ai` lags the 1.0 source in several places (Maven coordinates still listed as 0.7.1, MCP pages 404, no mention of the planner module split or HTTP transport decoupling). This tile codifies what the 1.0 source actually shows.
 
@@ -28,7 +28,7 @@ Two **always-on rules** carry the gotchas every Koog project hits — module coo
 ### Foundations
 | Skill | What it does |
 |---|---|
-| `scaffold-agent` | Bootstrap a new Koog 1.0 Kotlin project from scratch |
+| `scaffold-agent` | Bootstrap a new Koog 1.2 Kotlin project from scratch |
 | `add-tool` | Add a tool — annotated `@Tool` / typed `Tool<TArgs,TResult>` / sub-agent-as-tool |
 | `define-prompt` | Author prompts beyond `systemPrompt = "..."` — DSL, few-shot, augmenters |
 | `use-functional-agent` | Use `FunctionalAIAgent` — single suspending block, no graph, no planner |
@@ -85,8 +85,8 @@ Two **always-on rules** carry the gotchas every Koog project hits — module coo
 
 ## Scope
 
-This tile teaches **Kotlin** consumption of Koog 1.0 **on the JVM**. Java-interop surface (`AIAgentService`, `*Blocking` variants from #2005) is deferred to a future `jbaruch/koog-java`. Other Kotlin targets (Kotlin/JS, Kotlin/Native, Compose Multiplatform) are not covered — the rules and skills assume `kotlin("jvm")`, JDK 17, and JVM-only features (JVM shutdown hooks for OpenTelemetry, JDBC for persistence backends).
+This tile teaches **Kotlin** consumption of Koog 1.2 **on the JVM**. Java-interop surface (`AIAgentService`, `*Blocking` variants from #2005) is deferred to a future `jbaruch/koog-java`. Other Kotlin targets (Kotlin/JS, Kotlin/Native, Compose Multiplatform) are not covered — the rules and skills assume `kotlin("jvm")`, JDK 17, and JVM-only features (JVM shutdown hooks for OpenTelemetry, JDBC for persistence backends).
 
 ## Source of authority
 
-Where this tile and `docs.koog.ai` disagree, this tile follows the [Koog 1.0.0 source](https://github.com/JetBrains/koog/tree/1.0.0) and the [v1.0.0 release notes](https://github.com/JetBrains/koog/releases/tag/1.0.0).
+Where this tile and `docs.koog.ai` disagree, this tile follows the [Koog 1.2.0 source](https://github.com/JetBrains/koog/tree/1.0.0) and the [v1.0.0 release notes](https://github.com/JetBrains/koog/releases/tag/1.0.0).

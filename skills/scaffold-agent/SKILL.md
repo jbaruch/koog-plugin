@@ -1,7 +1,7 @@
 ---
 name: scaffold-agent
 description: >
-  Bootstrap a new Koog 1.0 Kotlin agent project from scratch: Gradle setup with the right
+  Bootstrap a new Koog 1.2 Kotlin agent project from scratch: Gradle setup with the right
   dependencies, JDK 17 toolchain, application Main that constructs an AIAgent via the
   top-level factory, and an environment-variable wiring for the LLM API key. Use when the
   user asks to "create a new Koog agent", "start a Koog project", "scaffold an agent app",
@@ -51,7 +51,7 @@ version = "0.1.0"
 repositories { mavenCentral() }
 
 dependencies {
-    implementation("ai.koog:koog-agents:1.0.0")
+    implementation("ai.koog:koog-agents:1.2.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
     testImplementation(kotlin("test"))
 }
@@ -65,7 +65,7 @@ application {
 }
 ```
 
-If the user picked a provider that requires a non-umbrella client artifact, add that dependency explicitly (e.g., `implementation("ai.koog:prompt-executor-litert-client:1.0.0")`).
+If the user picked a provider that requires a non-umbrella client artifact, add that dependency explicitly (e.g., `implementation("ai.koog:prompt-executor-litert-client:1.2.0-beta")`).
 
 Write `settings.gradle.kts` with `rootProject.name = "<directory-name>"` and a single `include(":")` is not needed for a flat project — leave it as just `rootProject.name = ...`.
 
@@ -121,7 +121,7 @@ build/
 ```markdown
 # <project name>
 
-A Koog 1.0 agent. Set `<PROVIDER>_API_KEY` and run `./gradlew run`.
+A Koog 1.2 agent. Set `<PROVIDER>_API_KEY` and run `./gradlew run`.
 ```
 
 Proceed immediately to Step 6.

@@ -1,7 +1,7 @@
 ---
 name: author-strategy
 description: >
-  Author a custom graph strategy for a Koog 1.0 agent — pick the right node types,
+  Author a custom graph strategy for a Koog 1.2 agent — pick the right node types,
   chain tool execution correctly, build edges with the infix vocabulary, and reach for
   subgraphs (`subgraphWithTask`, `subgraphWithVerification`) when steps deserve their
   own model, prompt, or tool subset while still sharing the agent's message history.

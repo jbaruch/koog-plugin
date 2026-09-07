@@ -1,7 +1,7 @@
 ---
 name: persist-chat-history
 description: >
-  Persist a Koog 1.0 agent's chat history to a durable backend — JDBC database
+  Persist a Koog 1.2 agent's chat history to a durable backend — JDBC database
   (`chat-history-jdbc`), AWS storage (`chat-history-aws`), or SQL-typed chat memory
   (`chat-memory-sql`) — so conversations survive process restarts and can be retrieved
   by session ID. Distinct from generic agent persistence (state checkpoints) and from
@@ -38,11 +38,11 @@ Proceed immediately to Step 3.
 ## Step 3 — Add the Dependency
 
 ```kotlin
-implementation("ai.koog:agents-features-chat-history-jdbc:1.0.0")
+implementation("ai.koog:agents-features-chat-history-jdbc:1.2.0")
 // or:
-// implementation("ai.koog:agents-features-chat-history-aws:1.0.0")
+// implementation("ai.koog:agents-features-chat-history-aws:1.2.0-beta")
 // or:
-// implementation("ai.koog:agents-features-chat-memory-sql:1.0.0")
+// implementation("ai.koog:agents-features-chat-memory-sql:1.2.0")
 ```
 
 For JDBC, also include the driver for the actual database (Postgres, etc.) — that's not provided by Koog.

@@ -1,7 +1,7 @@
 ---
 name: wire-ktor-server
 description: >
-  Expose a Koog 1.0 agent through a Ktor server — install the `koog-ktor` plugin,
+  Expose a Koog 1.2 agent through a Ktor server — install the `koog-ktor` plugin,
   load agent configuration from `application.conf` / `.yaml`, and register MCP servers
   inside the plugin block. Use when the user asks to "expose the agent over HTTP",
   "add Koog to my Ktor app", "wire the Ktor plugin", or describes a server-shaped
@@ -15,7 +15,7 @@ Process steps in order. Do not skip ahead.
 ## Step 1 — Add the Dependency
 
 ```kotlin
-implementation("ai.koog:koog-ktor:1.0.0")
+implementation("ai.koog:koog-ktor:1.2.0-beta")
 ```
 
 The umbrella `koog-agents` does not include the Ktor integration — add it explicitly.
@@ -129,6 +129,6 @@ For streaming responses, use `nodeLLMRequestStreaming` inside a custom strategy 
 Write the modified module and the dependency to disk with explicit `Path:` labels (same convention as `scaffold-agent`):
 
 - `Path: src/main/kotlin/com/example/Application.kt` — the file containing `Application.module()` (rename to the user's actual filename if different)
-- `Path: build.gradle.kts` — appended `ai.koog:koog-ktor:1.0.0` dependency line
+- `Path: build.gradle.kts` — appended `ai.koog:koog-ktor:1.2.0-beta` dependency line
 
 Create files if they don't exist. Do not respond with prose only. Finish here.

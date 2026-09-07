@@ -1,7 +1,7 @@
 ---
 name: add-persistence
 description: >
-  Add checkpoint-and-resume to a Koog 1.0 agent. Two modes — `runFromCheckpoint`
+  Add checkpoint-and-resume to a Koog 1.2 agent. Two modes — `runFromCheckpoint`
   for replay-only use without installing a feature, and the full Persistence
   feature when you need rolling checkpoints, replay-with-modifications, or planner-agent
   durability across restarts. Use when the user asks to "make the agent resumable",
@@ -54,7 +54,7 @@ Use when the agent needs to **write** checkpoints continuously during a run — 
 Add the dependency:
 
 ```kotlin
-implementation("ai.koog:agents-features-persistence-jdbc:1.0.0")
+implementation("ai.koog:agents-features-persistence-jdbc:1.2.0")
 // or another persistence backend module — JDBC is one of several
 ```
 

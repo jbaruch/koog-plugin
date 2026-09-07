@@ -2,7 +2,7 @@
 name: use-attachments
 description: >
   Send non-text content (images, files, audio) to the LLM as message attachments in
-  a Koog 1.0 agent — provider-aware encoding and the `attachments` block in the prompt
+  a Koog 1.2 agent — provider-aware encoding and the `attachments` block in the prompt
   DSL. Use when the user asks to "send an image to the LLM", "use multimodal input",
   "attach a file", "pass a PDF", or describes input the LLM should process that isn't
   plain text.

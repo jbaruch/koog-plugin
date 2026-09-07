@@ -1,7 +1,7 @@
 ---
 name: test-koog-agents
 description: >
-  Test Koog 1.0 agents deterministically — install `agents-test`, mock the prompt
+  Test Koog 1.2 agents deterministically — install `agents-test`, mock the prompt
   executor with scripted responses, inject a fake `KoogClock` for time-sensitive
   logic, and assert on tool-call sequences. Use when the user asks to "test the
   agent", "mock the LLM in tests", "write unit tests for my Koog agent", or
@@ -15,7 +15,7 @@ Process steps in order. Do not skip ahead.
 ## Step 1 — Add the Test Dependency
 
 ```kotlin
-testImplementation("ai.koog:agents-test:1.0.0")
+testImplementation("ai.koog:agents-test:1.2.0")
 ```
 
 This is a `testImplementation` — it should never appear in production classpath.

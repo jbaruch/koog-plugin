@@ -1,7 +1,7 @@
 {
   "name": "jbaruch/koog",
-  "version": "0.4.10",
-  "summary": "Koog 1.0 idioms, gotchas, and scaffolding skills for Kotlin agents on the JVM",
+  "version": "0.5.0",
+  "summary": "Koog 1.2 idioms, gotchas, and scaffolding skills for Kotlin agents on the JVM",
   "private": false,
   "entrypoint": "README.md",
   "keywords": [
@@ -10,6 +10,7 @@
     "ai-agents",
     "jvm",
     "agentic-workflows",
+    "agent-skills",
     "mcp",
     "rag",
     "spring-boot",
@@ -46,7 +47,9 @@
     "persist-chat-history": { "path": "skills/persist-chat-history/SKILL.md" },
     "test-koog-agents": { "path": "skills/test-koog-agents/SKILL.md" },
     "trace-agent-internals": { "path": "skills/trace-agent-internals/SKILL.md" },
-    "query-sql-from-agent": { "path": "skills/query-sql-from-agent/SKILL.md" }
+    "query-sql-from-agent": { "path": "skills/query-sql-from-agent/SKILL.md" },
+    "use-agent-skills": { "path": "skills/use-agent-skills/SKILL.md" },
+    "use-cli-agents": { "path": "skills/use-cli-agents/SKILL.md" }
   },
   "steering": {
     "module-coordinates": {

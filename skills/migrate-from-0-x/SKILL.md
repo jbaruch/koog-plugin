@@ -32,7 +32,7 @@ Proceed immediately to Step 2.
 
 Change every `ai.koog:*` artifact to `1.0.0` (or later). Don't leave mixed versions — pre-1.0 and 1.0 do not interoperate.
 
-If the codebase pulled Ktor types from Koog packages, that route was closed in 1.0 — add `ai.koog:http-client-ktor:1.0.0` explicitly. Run `./gradlew dependencies | grep -i ktor` if unsure.
+If the codebase pulled Ktor types from Koog packages, that route was closed in 1.0 — add `ai.koog:http-client-ktor:1.2.0` explicitly. Run `./gradlew dependencies | grep -i ktor` if unsure.
 
 Proceed immediately to Step 3.
 
@@ -49,7 +49,7 @@ Proceed immediately to Step 4.
 If the codebase uses planners, add the new module:
 
 ```kotlin
-implementation("ai.koog:agents-planner:1.0.0")
+implementation("ai.koog:agents-planner:1.2.0-beta")
 ```
 
 Then:

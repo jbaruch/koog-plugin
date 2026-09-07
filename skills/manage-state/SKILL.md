@@ -1,7 +1,7 @@
 ---
 name: manage-state
 description: >
-  Work with Koog 1.0 agent state — typed key-value `storage` on `AIAgentContext`,
+  Work with Koog 1.2 agent state — typed key-value `storage` on `AIAgentContext`,
   history compression strategies (TL;DR, sliding window, fact retrieval), and the
   `LongTermMemory` feature (which replaces the removed `AgentMemory`) for cross-session
   recall. Use when the user asks to "store state across nodes", "compress conversation
@@ -87,9 +87,9 @@ Finish here.
 Add the dependency:
 
 ```kotlin
-implementation("ai.koog:agents-features-longterm-memory:1.0.0")
+implementation("ai.koog:agents-features-longterm-memory:1.2.0-beta")
 // for Bedrock AgentCore backend (one option):
-implementation("ai.koog:agents-features-longterm-memory-aws:1.0.0")
+implementation("ai.koog:agents-features-longterm-memory-aws:1.2.0-beta")
 ```
 
 Install the feature inside `AIAgent(...)`'s trailing lambda:

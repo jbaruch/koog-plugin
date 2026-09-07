@@ -1,7 +1,7 @@
 ---
 name: domain-model-subtask-pipeline
 description: >
-  Author a Koog 1.0 agent as a typed pipeline of domain-modeled subtasks — tools
+  Author a Koog 1.2 agent as a typed pipeline of domain-modeled subtasks — tools
   sliced by access pattern (read / write / communication) into separate ToolSets,
   inter-subtask handoffs as `@Serializable` `@LLMDescription`-annotated data
   classes (not text prompts), each subtask wired with `subgraphWithTask[In, Out]`

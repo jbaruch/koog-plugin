@@ -2,6 +2,60 @@
 
 All notable changes to this tile are documented here. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [0.5.0] — 2026-09-07
+
+Retargets the tile from Koog 1.0 to **Koog 1.2.0** (released 2026-08-28) and covers the
+two surfaces added since 1.0. Findings below were produced by building a four-round
+agent against 1.2.0 end to end; each coordinate and package path was verified by
+compiling, not by reading release notes.
+
+### Added
+
+- `use-agent-skills` — the `skills` module Koog shipped in **1.2.0**, implementing the
+  Agent Skills specification (agentskills.io): `discoverSkills` / `generateSkillsPrompt`,
+  the SKILL.md frontmatter contract, the required `agents-ext` file tools, and
+  disclose-before-apply so the tool trace shows which skill fired. Evals:
+  `use-agent-skills-runtime-catalog`
+- `use-cli-agents` — `CliAIAgent`, added in **1.1.1**: drives Claude Code / Codex / an
+  arbitrary binary on subscription auth (`apiKey = null`) and composes via `.asNode()`.
+  Covers the named-`generateRequest` trap, the workspace-scoping requirement, and
+  fail-closed branching on the nullable `structuredResult`. Evals:
+  `use-cli-agents-cross-vendor-critic`, `use-cli-agents-refuses-plain-llm-call`
+
+### Changed
+
+- `rules/module-coordinates.md` retargeted to 1.2 and restructured around the failure
+  that actually costs build cycles — **two version lines**. The umbrella is `1.2.0`;
+  MCP, CLI agents, skills, the Google client, `prompt-executor-llms-all`, long-term
+  memory, `agents-ext` and `koog-agents-additions` publish **only** at `1.2.0-beta`.
+  The rule now carries the coordinate table instead of prose
+- **New:** documented that the umbrella does not bundle the Google provider. Gemini
+  needs both `prompt-executor-google-client` and `prompt-executor-llms-all`, both beta.
+  The symptom is `Unresolved reference 'google'` while `AIAgent` itself resolves, which
+  reads as a broken install rather than a missing dependency
+- **New:** a package-location table for symbols that are not where they look like they
+  should be — `McpServerInfo` under `.metadata`, `TextDocument` as an *interface* in
+  `ai.koog.rag.base` with no constructor, `SimilaritySearchStrategy` under
+  `longtermmemory.retrieval.search`, the file tools in `agents-ext`, `toolName` (not
+  `tool.name`) on tool events, `ToolRegistry.tools` returning `ToolBase`, and
+  `forwardTo` being a builder member that must **not** be imported
+- **New:** `maxAgentIterations` lives on `AIAgentConfig`, not the `AIAgent(...)` factory.
+  Passing it to the factory matches no overload and the compiler then reports a cascade
+  of unrelated errors inside the trailing lambda, which sends you hunting in the wrong
+  file. The default of 3 aborts any verify/refine graph
+- **New:** bound every critic loop. `subgraphWithVerification` will reject indefinitely
+  when the drafting phase cannot satisfy it, surfacing as
+  `AIAgentMaxNumberOfIterationsReachedException` — an unrecoverable hang wearing a
+  safety feature's clothes
+
+### Fixed
+
+- Removed the `-jvm` suffix guidance for Gradle consumers. At 1.2 the bare coordinate
+  (`ai.koog:agents-mcp:1.2.0-beta`) resolves the JVM variant through Gradle Module
+  Metadata; the suffix is now Maven-only. The old rule sent Gradle users to an artifact
+  they did not need
+- Tile summary and every skill description now say Koog 1.2 rather than Koog 1.0
+
 ## [0.4.10] — 2026-05-31
 
 ### Fixed

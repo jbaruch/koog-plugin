@@ -1,0 +1,1 @@
+{ "description": "Redirects a plain per-request LLM call away from CliAIAgent to a PromptExecutor" }

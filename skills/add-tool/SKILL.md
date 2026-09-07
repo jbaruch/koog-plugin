@@ -1,12 +1,12 @@
 ---
 name: add-tool
 description: >
-  Add a new tool to an existing Koog 1.0 agent. Pick the right registration style
+  Add a new tool to an existing Koog 1.2 agent. Pick the right registration style
   (@Tool + ToolSet annotation, Tool[TArgs,TResult] subclass, or sub-agent-as-tool),
   define the args, and wire the tool into the agent's ToolRegistry. Use when the user
   asks to "add a tool to my agent", "expose something to the LLM", "let the agent call
   a function", or "wrap this agent as a tool for another agent". Assumes a scaffolded
-  Koog 1.0 project — for new projects start with the scaffold-agent skill.
+  Koog 1.2 project — for new projects start with the scaffold-agent skill.
 ---
 
 # Add Tool Skill
@@ -62,7 +62,7 @@ val agent = AIAgent(
 )
 ```
 
-If the Kotlin function name doesn't read well to the LLM, add `@Tool(customName = "list_prs")`. As of Koog 1.0 this override is honored by `asTools()`.
+If the Kotlin function name doesn't read well to the LLM, add `@Tool(customName = "list_prs")`. As of Koog 1.2 this override is honored by `asTools()`.
 
 Tools that return non-String types: convert at the boundary to a `String` (`toString()`, a JSON-encoded shape, etc.). The LLM only sees the returned string.
 

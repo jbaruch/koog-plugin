@@ -1,7 +1,7 @@
 ---
 name: snapshot-and-restore
 description: >
-  Snapshot a running Koog 1.0 agent's state at arbitrary points and restore later —
+  Snapshot a running Koog 1.2 agent's state at arbitrary points and restore later —
   distinct from the persistence checkpoint loop in `add-persistence`. Snapshots are
   caller-triggered; persistence is automatic and continuous. Use when the user asks
   to "snapshot the agent", "save state at this point", "restore from a snapshot",
@@ -29,7 +29,7 @@ Proceed immediately to Step 2.
 ## Step 2 — Add the Dependency
 
 ```kotlin
-implementation("ai.koog:agents-features-snapshot:1.0.0")
+implementation("ai.koog:agents-features-snapshot:1.2.0")
 ```
 
 Proceed immediately to Step 3.
