@@ -1,5 +1,5 @@
 {
-  "context": "Negative case — tests whether the agent recognizes that the developer's data (structured, queryable, per-decision facts) belongs in a fact-storage primitive (LongTermMemory) or as a tool, NOT in chat-history. Installing JdbcChatHistory / ChatHistoryAws / ChatMemorySql here would force the agent to inject fake Message.User / Message.Assistant pseudo-turns to surface the facts, which the model misinterprets as today's conversation — the failure mode the anti-pattern in persist-chat-history Step 6 names. Weights favor functional correctness over prose explanation; a code-only refusal that picks the right primitive is the target behavior given the tile's Path: write convention.",
+  "context": "Negative case — tests whether the agent recognizes that the developer's data (structured, queryable, per-decision facts) belongs in a fact-storage primitive (LongTermMemory) or as a tool, NOT in chat-history. Installing JdbcChatHistory / ChatHistoryAws / ChatMemorySql here would force the agent to inject fake Message.User / Message.Assistant pseudo-turns to surface the facts, which the model misinterprets as today's conversation — the failure mode the anti-pattern in persist-chat-history Step 6 names. Weights favor functional correctness over prose explanation; a code-only refusal that picks the right primitive is the target behavior given the plugin's Path: write convention.",
   "type": "weighted_checklist",
   "checklist": [
     {
@@ -20,7 +20,7 @@
     {
       "name": "Names the chat-history-vs-fact-store distinction",
       "max_score": 10,
-      "description": "Surfaces (in prose OR as a code comment OR via the picked dependency line) that chat-history persistence is for real conversation turns and that the developer's data is a different shape. A one-line code comment near the LongTermMemory install satisfies this — full prose walkthrough is not required given the tile's code-first Path: convention"
+      "description": "Surfaces (in prose OR as a code comment OR via the picked dependency line) that chat-history persistence is for real conversation turns and that the developer's data is a different shape. A one-line code comment near the LongTermMemory install satisfies this — full prose walkthrough is not required given the plugin's code-first Path: convention"
     }
   ]
 }

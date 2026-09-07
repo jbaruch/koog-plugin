@@ -67,15 +67,13 @@ It does **not** pull Google.
 - Symptom when you forget: `Unresolved reference 'google'` and
   `Unresolved reference 'simpleGoogleAIExecutor'` while `AIAgent` itself resolves fine
 
-## Do NOT add the `-jvm` suffix
+## Gradle takes the bare coordinate; only Maven takes `-jvm`
 
-Earlier versions of this rule told you to write `ai.koog:agents-mcp-jvm`. **That is no
-longer correct.** At 1.2 the Gradle Module Metadata resolves the JVM variant from the
-bare coordinate: use `ai.koog:agents-mcp:1.2.0-beta`. The `-jvm` artifacts still exist
-for Maven consumers, who need them because Maven does not read Gradle metadata.
-
-- Gradle → bare coordinate
+- Gradle → bare coordinate (`ai.koog:agents-mcp:1.2.0-beta`). Gradle Module Metadata
+  resolves the JVM variant
 - Maven → `-jvm` suffix (`koog-agents-jvm`, `agents-mcp-jvm`, …)
+
+Do not add `-jvm` to a Gradle coordinate.
 
 ## Package locations that are not where you would guess
 
@@ -94,45 +92,6 @@ that looks like a missing dependency but is a wrong import.
 | `JVMFileSystemProvider` | `ai.koog.rag.base.files` | |
 | tool event fields | — | `ToolCallStartingContext` exposes `toolName` / `toolArgs`, **not** `tool.name` |
 | `ToolRegistry.tools` | — | Returns `List<ToolBase<*, *>>`, not `List<Tool<*, *>>` |
-
-## `maxAgentIterations` lives on `AIAgentConfig`, not the factory
-
-The `AIAgent(...)` overloads that take `systemPrompt` + `llmModel` have **no**
-`maxAgentIterations` parameter. Passing one silently fails to match any overload and
-the compiler then reports a cascade of unrelated errors inside the trailing lambda.
-
-```kotlin
-AIAgent(
-    promptExecutor = executor,
-    agentConfig = AIAgentConfig.withSystemPrompt(
-        prompt = SYSTEM_PROMPT,
-        llm = GoogleModels.Gemini3_5Flash,
-        maxAgentIterations = 200,   // default is 3 — far too low for a verify/refine loop
-    ),
-    strategy = myStrategy,
-    toolRegistry = registry,
-) { /* features */ }
-```
-
-The default of **3** will abort any non-trivial graph. A verify → refine → verify loop
-needs 100+.
-
-## Bound every critic loop
-
-`subgraphWithVerification` will reject indefinitely if the drafting phase cannot satisfy
-it. That is an unrecoverable hang dressed as a safety feature, and it surfaces as
-`AIAgentMaxNumberOfIterationsReachedException`. Count refusals and route to `nodeFinish`
-after N:
-
-```kotlin
-val refusals = AtomicInteger(0)
-edge(verify forwardTo refine
-        onCondition { !it.successful && refusals.incrementAndGet() <= 2 }
-        transformed { it.feedback })
-edge(verify forwardTo nodeFinish
-        onCondition { !it.successful }          // out of retries: ship the last draft
-        transformed { it.input })
-```
 
 ## JDK and tooling minima
 

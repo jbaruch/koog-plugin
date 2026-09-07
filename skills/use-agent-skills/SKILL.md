@@ -22,10 +22,13 @@ run. Reach for them when the set of capabilities should change without recompili
 a directory a non-developer drops files into, a skills repo shared across agents.
 
 If the capability is fixed at build time and typed, that is a **tool**, not a skill —
-use `Skill(skill: "add-tool")` instead. If the work is a multi-stage pipeline with
-typed handoffs, use `Skill(skill: "domain-model-subtask-pipeline")`.
+use `Skill(skill: "add-tool")` instead. **Finish here.**
 
-Proceed immediately to Step 1.
+If the work is a multi-stage pipeline with typed handoffs, use
+`Skill(skill: "domain-model-subtask-pipeline")`. **Finish here.**
+
+Continue to Step 1 only when the capability set genuinely needs to change without a
+recompile.
 
 ## Step 1 — Add the Dependencies
 
@@ -70,19 +73,16 @@ Four hard requirements, each of which silently drops the skill when violated:
 
 Proceed immediately to Step 3.
 
-## Step 3 — Discover and Generate the Catalog
+## Step 3 — Discover the Skills
 
 Path: `Main.kt`
 
 ```kotlin
 import ai.koog.rag.base.files.JVMFileSystemProvider
 import ai.koog.skills.discovery.discoverSkills
-import ai.koog.skills.prompt.SkillsPromptFormat
-import ai.koog.skills.prompt.generateSkillsPrompt
 
 val skillsRoot = "/absolute/path/to/skills"
 val discovered = discoverSkills(JVMFileSystemProvider.ReadOnly, listOf(skillsRoot))
-val skillsPrompt = generateSkillsPrompt(discovered, SkillsPromptFormat.XML)
 ```
 
 Use `JVMFileSystemProvider.ReadOnly` — a skills directory is input, and a read-only
@@ -101,7 +101,23 @@ tasks.named<JavaExec>("run") {
 
 Proceed immediately to Step 4.
 
-## Step 4 — Wire the Agent
+## Step 4 — Generate the Catalog Prompt
+
+Path: `Main.kt`
+
+```kotlin
+import ai.koog.skills.prompt.SkillsPromptFormat
+import ai.koog.skills.prompt.generateSkillsPrompt
+
+val skillsPrompt = generateSkillsPrompt(discovered, SkillsPromptFormat.XML)
+```
+
+`SkillsPromptFormat` also offers `YAML` and `JSON`. Default to `XML` — the catalog
+nests, and XML degrades most gracefully when a description contains markup.
+
+Proceed immediately to Step 5.
+
+## Step 5 — Wire the Agent
 
 Path: `Main.kt`
 
@@ -122,15 +138,12 @@ val agent = AIAgent(
 )
 ```
 
-**Instruct the agent to disclose before applying.** Two reasons: the tool trace becomes
-a readable audit of which skill fired, and a skill that was silently mis-selected is
-otherwise invisible. `SkillsPromptFormat` also offers `YAML` and `JSON`; XML is the
-default choice because the catalog nests and XML degrades most gracefully when a
-description contains markup.
+**Instruct the agent to disclose before applying.** The tool trace is then a readable
+audit of which skill fired, and a mis-selected skill becomes visible instead of silent.
 
-Proceed immediately to Step 5.
+Proceed immediately to Step 6.
 
-## Step 5 — Verify
+## Step 6 — Verify
 
 Confirm all four, in order:
 

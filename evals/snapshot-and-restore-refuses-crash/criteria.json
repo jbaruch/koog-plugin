@@ -1,5 +1,5 @@
 {
-  "context": "Negative case — tests whether the agent distinguishes caller-triggered snapshots (semantic save points, fork/replay tooling) from continuous automatic checkpointing (the Persistence feature). The developer's need is crash recovery without sprinkling save calls — that's the Persistence feature, not snapshot. The developer's word choice (\"snapshot\") points the wrong way; the tile expects the agent to surface the mismatch.",
+  "context": "Negative case — tests whether the agent distinguishes caller-triggered snapshots (semantic save points, fork/replay tooling) from continuous automatic checkpointing (the Persistence feature). The developer's need is crash recovery without sprinkling save calls — that's the Persistence feature, not snapshot. The developer's word choice (\"snapshot\") points the wrong way; the plugin expects the agent to surface the mismatch.",
   "type": "weighted_checklist",
   "checklist": [
     {

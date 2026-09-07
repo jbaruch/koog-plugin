@@ -1,5 +1,5 @@
 {
-  "context": "Negative case — tests whether the agent identifies the developer's situation (stable system prompt content with unique per-call user inputs) as a provider-side caching problem, not a response caching problem, and routes them to the right tile skill. Wrapping the executor in an in-process response cache here would be wrong: responses are not actually repeated, so the cache would never hit and the developer would conclude caching doesn't work.",
+  "context": "Negative case — tests whether the agent identifies the developer's situation (stable system prompt content with unique per-call user inputs) as a provider-side caching problem, not a response caching problem, and routes them to the right skill in this plugin. Wrapping the executor in an in-process response cache here would be wrong: responses are not actually repeated, so the cache would never hit and the developer would conclude caching doesn't work.",
   "type": "weighted_checklist",
   "checklist": [
     {

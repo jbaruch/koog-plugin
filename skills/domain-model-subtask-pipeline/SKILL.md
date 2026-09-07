@@ -104,7 +104,7 @@ Match the model to the subtask:
 package `ai.koog.agents.ext.agent` but ship inside the **`agents-core`**
 artifact, which the `koog-agents` umbrella already pulls. No extra
 dependency needed — the standalone `ai.koog:agents-ext` artifact is a
-separate `1.0.0-beta` module and is NOT required for these APIs.
+separate beta-line module and is NOT required for these APIs.
 
 If you type-annotate the returned strategy, the strategy type lives in
 `ai.koog.agents.core.agent.entity.AIAgentGraphStrategy` (not bare

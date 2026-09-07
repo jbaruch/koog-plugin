@@ -2,7 +2,7 @@
 name: wire-mcp-server
 description: >
   Connect a Koog 1.2 agent to an MCP (Model Context Protocol) server, using the
-  primary 1.0 Streamable HTTP transport — or fall back to SSE / stdio when the
+  primary Streamable HTTP transport — or fall back to SSE / stdio when the
   remote server doesn't speak Streamable HTTP yet. Adds the agents-mcp dependency,
   builds a ToolRegistry from the MCP server's exposed tools, and merges it with
   the agent's existing tool registry. Use when the user asks to "connect to an
@@ -22,7 +22,7 @@ Ask the user, one question at a time:
 - The connection details — URL for HTTP/SSE, or the command + args for stdio
 - Whether any environment variables (tokens, API keys) need to be set for the server
 
-If the user doesn't know which transport the server supports, default to Streamable HTTP and plan a fallback to SSE if connection fails — the primary 1.0 transport is Streamable HTTP (MCP SDK 0.11.x), but a number of in-the-wild servers still only expose SSE.
+If the user doesn't know which transport the server supports, default to Streamable HTTP and plan a fallback to SSE if connection fails — the primary transport is Streamable HTTP (MCP SDK 0.11.x), but a number of in-the-wild servers still only expose SSE.
 
 Proceed immediately to Step 2.
 
@@ -36,8 +36,8 @@ implementation("ai.koog:agents-mcp:1.2.0-beta")
 
 **Two gotchas the umbrella version hides:**
 
-- `agents-mcp` (and `agents-mcp-server`) ship as **`1.0.0-beta`** — Koog 1.2's stable release did not publish them at `1.0.0`. Pin `1.0.0-beta` (or later when stable).
-- They publish only JVM variants. Use the **`-jvm` suffix** (`agents-mcp-jvm`, not bare `agents-mcp`) — without it, Gradle KMP variant resolution can't pick the JVM artifact at this version and the build fails with "could not find" errors.
+- `agents-mcp` (and `agents-mcp-server`) publish only on the **beta version line**. `1.2.0` does not exist for them — pin `1.2.0-beta`. See `rules/module-coordinates.md`.
+- Use the **bare coordinate on Gradle** (`ai.koog:agents-mcp`). Gradle Module Metadata resolves the JVM variant. Only Maven consumers need the `-jvm` suffix.
 
 Re-run `./gradlew --refresh-dependencies` if the project is already imported into the IDE.
 
@@ -134,7 +134,7 @@ Add the server module:
 implementation("ai.koog:agents-mcp-server:1.2.0-beta")
 ```
 
-Same `1.0.0-beta` and `-jvm`-suffix gotchas from Step 2 apply.
+Same beta-line and Gradle-vs-Maven coordinate gotchas from Step 2 apply.
 
 The same `@Tool` / `@LLMDescription` / `ToolSet` you'd register on a Koog agent via `Skill(skill: "add-tool")` is what you bridge over. Wrap it in a `ToolRegistry` and hand to `startStdioMcpServer`:
 

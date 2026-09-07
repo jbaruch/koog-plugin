@@ -22,13 +22,18 @@ when you want a step to run on a vendor you have a *subscription* to rather than
 API key, or when you deliberately want a second vendor's judgement in the loop.
 
 Do **not** reach for it as a general LLM call. It is one to two orders of magnitude
-slower than an API call — measured against 1.2.0-beta on the same prompt: `claude`
-~11s, `codex` ~38s, `grok` ~66s, versus ~2-3s for a direct API call. For an ordinary
-model call use a `PromptExecutor`.
+slower than an API call — budget 10-60s per invocation against 2-3s for a direct API
+call.
 
-Ask the user which CLI, and confirm it is installed and logged in before writing code.
+If the request is an ordinary model call — one prompt, one completion, no second
+vendor's judgement wanted — recommend a `PromptExecutor` and say why it is the better
+fit. **Finish here.** Do not add `agents-cli`.
 
-Proceed immediately to Step 1.
+Continue only when the user wants a subscription-authenticated CLI or a deliberate
+second-vendor step. Ask which CLI, and confirm it is installed and logged in before
+writing code.
+
+Proceed to Step 1.
 
 ## Step 1 — Add the Dependency
 
@@ -83,11 +88,9 @@ Proceed immediately to Step 3.
 ## Step 3 — Pen It In With a Workspace
 
 `workspace` defaults to `"."`. **These are coding agents: they will read the working
-directory.** Observed against a real CLI — asked only to produce a JSON object, it
-listed the project directory, found a spec file, read it, and used its contents to
-"get the answer right". Impressive; also a pipeline stage silently taking a dependency
-on whatever files happen to be nearby, and an exfiltration path if the prompt is
-attacker-influenced.
+directory** — including files the step was never meant to depend on. That makes a
+CLI-backed stage silently dependent on whatever happens to be nearby, and an
+exfiltration path when the prompt is attacker-influenced.
 
 ```kotlin
 private val scratchDir = Files.createTempDirectory("cli-agent")
@@ -128,6 +131,10 @@ A structured response carries only what you declared. If the next node needs the
 being reviewed, capture it on the inbound edge (`transformed { last = it; it }`); the
 critique will not carry it for you.
 
+The `review → fix → review` cycle above is unbounded as written. Bound it with a
+run-scoped refusal counter and terminate on an explicit rejection — use
+`Skill(skill: "author-strategy")` for that shape.
+
 Proceed immediately to Step 5.
 
 ## Step 5 — Verify
@@ -146,6 +153,6 @@ Proceed immediately to Step 5.
 - Subscription CLIs have their own rate limits, and a graph that retries will consume
   them fast
 - A verify/refine loop with a CLI critic runs to several minutes end to end. Bound the
-  loop (see `rules/module-coordinates.md`)
+  loop and terminate on an explicit rejection — use `Skill(skill: "author-strategy")`
 - If you need this in a server request path, you almost certainly want a
   `PromptExecutor` instead

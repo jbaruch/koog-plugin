@@ -6,7 +6,7 @@ description: >
   define the args, and wire the tool into the agent's ToolRegistry. Use when the user
   asks to "add a tool to my agent", "expose something to the LLM", "let the agent call
   a function", or "wrap this agent as a tool for another agent". Assumes a scaffolded
-  Koog 1.2 project — for new projects start with the scaffold-agent skill.
+  Koog 1.2 project — for new projects invoke Skill(skill: "scaffold-agent") first.
 ---
 
 # Add Tool Skill

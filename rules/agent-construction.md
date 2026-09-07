@@ -20,10 +20,15 @@ alwaysApply: true
 - The single-step "call LLM, run tools if asked, loop until text reply" strategy is `singleRunStrategy(parallelTools: Boolean = false)`. It's the default; omit it from the call unless you're overriding it
 - Authoring a custom strategy is a separate workflow — use the `author-strategy` skill
 
-## Don't hardcode `maxIterations`
+## The iteration cap has two names and two defaults
 
-- `maxIterations` defaults to 50 in the factory. Override it only when the strategy or planner has a clear bound — uncapped loops are how agentic code burns money in production
-- Planner agents need much higher caps (the in-repo example uses 400) — each step is at least one LLM round-trip
+The cap is one underlying value, `AIAgentConfig.maxAgentIterations`, reached by two different parameter names depending on which overload you call. Verified against 1.2.0.
+
+- The convenience overloads (`promptExecutor` + `llmModel` + optional `systemPrompt`) expose it as **`maxIterations`, defaulting to 50**. There is no `maxAgentIterations` parameter on these — passing that name matches no overload, and the compiler then reports a cascade of unrelated errors inside the trailing lambda rather than naming the bad argument
+- The `agentConfig` overloads take no cap parameter at all. Set `maxAgentIterations` on the `AIAgentConfig` you pass in
+- `AIAgentConfig.withSystemPrompt(...)` defaults `maxAgentIterations` to **3**. That is the trap: the same graph that runs on the convenience overload's 50 aborts on a config built this way. Set it explicitly whenever you build a config by hand
+- A verify → refine → verify loop needs 100+; planner agents need much higher (the in-repo example uses 400) — each step is at least one LLM round-trip
+- Raising the cap is not a substitute for bounding the loop itself. A graph that cannot converge exhausts any cap and surfaces as `AIAgentMaxNumberOfIterationsReachedException` — see the `author-strategy` skill
 
 ## Identify and clock
 

@@ -123,14 +123,24 @@ val fix by subgraphWithTask<CriticResult<String>, String>(tools = fixTools, llmM
     "system prompt that incorporates ${vr.feedback}..."
 }
 
-edge(verify forwardTo fix onCondition { !it.successful })
-edge(verify forwardTo nodeFinish onCondition { it.successful } transformed { "Project is correct." })
+edge(verify forwardTo fix onCondition { !it.successful && refusals.incrementAndGet() <= MAX_REFUSALS })
+edge(verify forwardTo nodeFinish onCondition { it.successful } transformed { Reviewed.Approved(it.input) })
+edge(verify forwardTo nodeFinish onCondition { !it.successful } transformed { Reviewed.Rejected(it.input, it.feedback) })
 edge(fix forwardTo verify)
 ```
 
 The generate → verify → fix shape is the canonical "real agentic workflow" demo — it shows iterative correction without inventing a planner.
 
-`subgraphWithTask`, `subgraphWithVerification`, and `CriticResult` live in package `ai.koog.agents.ext.agent` but ship inside the **`agents-core`** artifact, which the `koog-agents` umbrella already pulls. No extra dependency needed — the standalone `ai.koog:agents-ext` artifact is a separate `1.0.0-beta` module and is NOT required for these APIs.
+**Bound the loop, and make exhaustion visible.** `subgraphWithVerification` will reject indefinitely if the drafting phase cannot satisfy it — an unrecoverable hang dressed as a safety feature, surfacing as `AIAgentMaxNumberOfIterationsReachedException` once the run's iteration cap is hit (see `rules/agent-construction.md`). Count refusals against a run-scoped counter and route to `nodeFinish` when they are spent:
+
+```kotlin
+private const val MAX_REFUSALS = 2
+val refusals = AtomicInteger(0)   // run-scoped: one per agent run, not per strategy object
+```
+
+The exhaustion edge must terminate with an **explicit unapproved outcome** the caller can branch on — the `Reviewed.Rejected` above — never with the last draft alone. Returning an unapproved draft as if it had passed makes the critic decorative: the caller cannot tell an approved result from a rejected one. Only return a bare draft when the caller has explicitly asked for best-effort output.
+
+`subgraphWithTask`, `subgraphWithVerification`, and `CriticResult` live in package `ai.koog.agents.ext.agent` but ship inside the **`agents-core`** artifact, which the `koog-agents` umbrella already pulls. No extra dependency needed — the standalone `ai.koog:agents-ext` artifact is a separate beta-line module and is NOT required for these APIs.
 
 If you type-annotate the returned strategy, the strategy type lives in `ai.koog.agents.core.agent.entity.AIAgentGraphStrategy` (not bare `ai.koog.agents.core.agent`).
 

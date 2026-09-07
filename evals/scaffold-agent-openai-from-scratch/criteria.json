@@ -30,7 +30,7 @@
     {
       "name": "Omits the default singleRunStrategy",
       "max_score": 10,
-      "description": "Does NOT pass strategy = singleRunStrategy() to the factory — it's the default; explicit listing adds noise and the rules in this tile discourage it for the demo scaffold"
+      "description": "Does NOT pass strategy = singleRunStrategy() to the factory — it's the default; explicit listing adds noise and the rules in this plugin discourage it for the demo scaffold"
     },
     {
       "name": "Runs the agent inside runBlocking",

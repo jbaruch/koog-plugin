@@ -1,5 +1,5 @@
 {
-  "name": "koog-tessl",
+  "name": "koog-plugin",
   "mode": "vendored",
   "dependencies": {
     "jbaruch/coding-policy": {

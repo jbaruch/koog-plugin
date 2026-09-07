@@ -1,10 +1,10 @@
 # Changelog
 
-All notable changes to this tile are documented here. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
+All notable changes to this plugin are documented here. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
 ## [0.5.0] — 2026-09-07
 
-Retargets the tile from Koog 1.0 to **Koog 1.2.0** (released 2026-08-28) and covers the
+Retargets the plugin from Koog 1.0 to **Koog 1.2.0** (released 2026-08-28) and covers the
 two surfaces added since 1.0. Findings below were produced by building a four-round
 agent against 1.2.0 end to end; each coordinate and package path was verified by
 compiling, not by reading release notes.
@@ -39,14 +39,21 @@ compiling, not by reading release notes.
   `longtermmemory.retrieval.search`, the file tools in `agents-ext`, `toolName` (not
   `tool.name`) on tool events, `ToolRegistry.tools` returning `ToolBase`, and
   `forwardTo` being a builder member that must **not** be imported
-- **New:** `maxAgentIterations` lives on `AIAgentConfig`, not the `AIAgent(...)` factory.
-  Passing it to the factory matches no overload and the compiler then reports a cascade
-  of unrelated errors inside the trailing lambda, which sends you hunting in the wrong
-  file. The default of 3 aborts any verify/refine graph
-- **New:** bound every critic loop. `subgraphWithVerification` will reject indefinitely
-  when the drafting phase cannot satisfy it, surfacing as
+- **New:** `rules/agent-construction.md` now documents the iteration cap honestly. It is
+  one underlying value, `AIAgentConfig.maxAgentIterations`, reached under two different
+  parameter names. The convenience `AIAgent(...)` overloads expose it as `maxIterations`
+  and default it to **50**; the `agentConfig` overloads expose no cap at all; and
+  `AIAgentConfig.withSystemPrompt(...)` defaults `maxAgentIterations` to **3**. Passing
+  the name `maxAgentIterations` to a convenience overload matches nothing, and the
+  compiler then reports a cascade of unrelated errors inside the trailing lambda, which
+  sends you hunting in the wrong file. Verified against the 1.2.0 sources of
+  `AIAgentFactory.kt` and `AIAgentConfig.kt`
+- **New:** `author-strategy` now bounds its verify/fix loop. `subgraphWithVerification`
+  will reject indefinitely when the drafting phase cannot satisfy it, surfacing as
   `AIAgentMaxNumberOfIterationsReachedException` — an unrecoverable hang wearing a
-  safety feature's clothes
+  safety feature's clothes. The exhaustion edge terminates with an explicit unapproved
+  outcome rather than shipping the last draft as if it had passed; a critic whose
+  rejection is indistinguishable from an approval is decorative
 
 ### Fixed
 
@@ -54,7 +61,53 @@ compiling, not by reading release notes.
   (`ai.koog:agents-mcp:1.2.0-beta`) resolves the JVM variant through Gradle Module
   Metadata; the suffix is now Maven-only. The old rule sent Gradle users to an artifact
   they did not need
-- Tile summary and every skill description now say Koog 1.2 rather than Koog 1.0
+- Plugin summary and every skill description now say Koog 1.2 rather than Koog 1.0
+- `skills/wire-mcp-server` still pinned MCP at `1.0.0-beta` and still demanded the `-jvm`
+  suffix, in both Step 2 and the server section — directly contradicting the retargeted
+  coordinate rule three files away. An agent loading both got opposite instructions
+- `README.md` labelled its authority link "Koog 1.2.0 source" while pointing at
+  `tree/1.0.0`, and cited the v1.0.0 release notes. Consumers resolving an API
+  disagreement were sent to the wrong release. Both targets now resolve to 1.2.0
+- `README.md`'s `module-coordinates` summary row still described the 1.0 contract
+  (`1.0+`, `-jvm` suffix). It now matches the rule it summarizes
+- `README.md` skills tables gained the two new rows; `use-agent-skills` and
+  `use-cli-agents` shipped in the manifest but were invisible on the entrypoint
+- `Step 0` in both new skills redirected unsuitable requests to another skill and then
+  fell through into installing the dependency anyway. Both redirects are now terminal
+- `add-tool`'s description referred to `scaffold-agent` in prose instead of a typed
+  `Skill(skill: ...)` call — the only prose cross-skill reference left in the plugin
+- `migrate-from-0-x` told readers to set every `ai.koog:*` artifact to one version
+  string, which cannot work across two version lines
+
+### Manifest and terminology
+
+- Migrated `tile.json` to `.tessl-plugin/plugin.json` via `tessl plugin migrate`. The
+  publish workflow's path filter and display name follow it. `keywords` and `entrypoint`
+  were carried across by hand — the migration drops them
+- "Tile" is retired throughout in favour of **agentic context plugin**. Renamed the
+  repository to `jbaruch/koog-plugin`. Literal `tessl` CLI invocations, registry URLs,
+  and the badge endpoint are unchanged: those are commands and addresses, not
+  terminology
+
+### Notes moved off the loaded surfaces
+
+Detail trimmed from skills and rules under `context-writing-style`'s What to Cut, kept
+here because it is the evidence behind the directives:
+
+- CLI agent latency, measured against 1.2.0-beta on one prompt: `claude` ~11s, `codex`
+  ~38s, `grok` ~66s, against ~2-3s for a direct API call. This is the number behind
+  "one to two orders of magnitude slower" and the 10-60s step budget
+- Why `use-cli-agents` insists on a scratch workspace: asked only to emit a JSON object,
+  a real CLI listed the project directory, found a spec file, read it, and used its
+  contents to get the answer right. Impressive, and also a pipeline stage silently
+  taking a dependency on whatever files happen to be nearby
+- The `-jvm` rule reversed between 0.4.x and 0.5.0. Earlier versions of
+  `module-coordinates` instructed `ai.koog:agents-mcp-jvm`; at 1.2 Gradle Module
+  Metadata resolves the JVM variant from the bare coordinate, and the suffix is needed
+  only by Maven, which does not read that metadata
+- `rules/module-coordinates.md` no longer carries Kotlin examples. Rule Format allows
+  code blocks only for specific commands, so the iteration example moved into
+  `rules/agent-construction.md` as prose and the critic loop into `author-strategy`
 
 ## [0.4.10] — 2026-05-31
 
