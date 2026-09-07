@@ -26,7 +26,7 @@ permissions:
 
 jobs:
   publish:
-    uses: jbaruch/coding-policy/.github/workflows/publish-plugin.yml@af116ebf18a7c46a672bf176064908736bc8ac28
+    uses: jbaruch/coding-policy/.github/workflows/publish-plugin.yml@e9ba7b27c8e7db9c67a29ccc685b1824a0caeb7a
     secrets:
       TESSL_TOKEN: ${{ secrets.TESSL_TOKEN }}
     with:
