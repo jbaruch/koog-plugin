@@ -1,7 +1,7 @@
 ---
 name: cache-llm-calls
 description: >
-  Add in-process caching of LLM calls to a Koog 1.0 agent via `prompt-executor-cached` —
+  Add in-process caching of LLM calls to a Koog 1.2 agent via `prompt-executor-cached` —
   cache whole prompt→response pairs locally so identical calls skip the API. Distinct
   from provider-side Anthropic prompt caching (covered by `enable-prompt-caching`).
   Backends include in-memory (default), file-based, and Redis. Use when the user asks
@@ -40,11 +40,11 @@ Proceed immediately to Step 3.
 ## Step 3 — Add the Dependencies
 
 ```kotlin
-implementation("ai.koog:prompt-executor-cached:1.0.0")
+implementation("ai.koog:prompt-executor-cached:1.2.0")
 // pick one backend:
-implementation("ai.koog:prompt-cache-files:1.0.0")
+implementation("ai.koog:prompt-cache-files:1.2.0")
 // or:
-// implementation("ai.koog:prompt-cache-redis:1.0.0")
+// implementation("ai.koog:prompt-cache-redis:1.2.0-beta")
 // or in-memory (no extra dep — bundled with prompt-executor-cached)
 ```
 

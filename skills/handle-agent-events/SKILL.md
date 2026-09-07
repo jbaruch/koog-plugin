@@ -1,7 +1,7 @@
 ---
 name: handle-agent-events
 description: >
-  Install per-step event handlers on a Koog 1.0 agent — tool-call start/end, LLM
+  Install per-step event handlers on a Koog 1.2 agent — tool-call start/end, LLM
   request/response, agent finish, error events. Useful for stdout logging during
   development, visualizing planner decisions on stage during demos, or pushing
   events to a non-OTel sink. Use when the user asks to "log tool calls", "see what
@@ -17,7 +17,7 @@ Process steps in order. Do not skip ahead.
 ## Step 1 — Add the Dependency
 
 ```kotlin
-implementation("ai.koog:agents-features-event-handler:1.0.0")
+implementation("ai.koog:agents-features-event-handler:1.2.0")
 ```
 
 The umbrella `koog-agents` does not include the event handler — add it explicitly.

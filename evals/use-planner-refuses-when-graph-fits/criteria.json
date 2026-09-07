@@ -5,7 +5,7 @@
     {
       "name": "Names the topology as the disqualifying signal",
       "max_score": 25,
-      "description": "Identifies in prose that the developer's workflow has a fixed phase ordering known at design time — not that the LLM picks tools within phases. Surfaces the test from the Koog tile: the planner is for runtime-decided sequencing, not for tool selection within fixed steps"
+      "description": "Identifies in prose that the developer's workflow has a fixed phase ordering known at design time — not that the LLM picks tools within phases. Surfaces the test from the Koog plugin: the planner is for runtime-decided sequencing, not for tool selection within fixed steps"
     },
     {
       "name": "Redirects to the graph DSL",

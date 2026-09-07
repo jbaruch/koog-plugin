@@ -1,7 +1,7 @@
 ---
 name: model-planner-subtasks
 description: >
-  Model a problem domain as a tree of typed subtasks the Koog 1.0 planner can execute —
+  Model a problem domain as a tree of typed subtasks the Koog 1.2 planner can execute —
   the `PlannerNode` data model, parallel vs sequential composition, accessing
   in-flight subtasks through `AIAgentStorage`, retry-on-parse-failure edges, and
   TL;DR compression between phases. Goes deeper than `use-planner` (which only picks

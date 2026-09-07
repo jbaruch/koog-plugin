@@ -1,0 +1,31 @@
+{
+  "context": "CliAIAgent is attractive for the wrong reason here. The task is a plain per-request LLM call on a synchronous path; a CLI agent spawns a cold process per call and measures 11-66s against ~2s. Tests whether the skill redirects instead of doing as it is told. An empty or stubbed response fails every criterion.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Does NOT swap the request path to CliAIAgent",
+      "max_score": 30,
+      "description": "Declines to replace the PromptExecutor call with CliAIAgent for this synchronous endpoint. A solution that simply performs the swap fails. An empty, missing, or stubbed solution also fails this criterion — it must actually give the advice"
+    },
+    {
+      "name": "Names the latency, concretely",
+      "max_score": 25,
+      "description": "States that a CLI agent spawns a fresh process with a cold context per invocation and is roughly an order of magnitude slower (tens of seconds vs ~2s), which is disqualifying on a synchronous request path. A vague 'it may be slower' does not earn this"
+    },
+    {
+      "name": "Engages the cost argument rather than ignoring it",
+      "max_score": 20,
+      "description": "Acknowledges the engineer's actual motivation (the API bill) and addresses it — subscription rate limits do not survive per-request traffic, and per-seat licences are not a serving tier. Does not simply refuse without engaging the reason he raised it"
+    },
+    {
+      "name": "Keeps the PromptExecutor and offers a real cost lever",
+      "max_score": 15,
+      "description": "Leaves the request path on a PromptExecutor and points at something that genuinely reduces cost: prompt caching, a cheaper model tier, or a response cache (cache-llm-calls). Does not leave the developer with only a 'no'"
+    },
+    {
+      "name": "Says where CliAIAgent would be right",
+      "max_score": 10,
+      "description": "Notes at least one fitting use — offline/batch work, or a deliberately cross-vendor review step — so the engineer learns the boundary rather than just being blocked"
+    }
+  ]
+}

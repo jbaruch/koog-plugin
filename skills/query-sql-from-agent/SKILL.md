@@ -1,7 +1,7 @@
 ---
 name: query-sql-from-agent
 description: >
-  Give a Koog 1.0 agent the ability to query a SQL database safely — install
+  Give a Koog 1.2 agent the ability to query a SQL database safely — install
   `agents-features-sql`, register the database connection, and expose schema-aware
   query tools the LLM can call. Includes safety guidance (read-only by default,
   schema scoping, parameterized queries). Use when the user asks to "let the agent
@@ -27,7 +27,7 @@ Proceed immediately to Step 2.
 ## Step 2 — Add the Dependency
 
 ```kotlin
-implementation("ai.koog:agents-features-sql:1.0.0")
+implementation("ai.koog:agents-features-sql:1.2.0")
 ```
 
 Also include the JDBC driver for the actual database (Postgres, MySQL, SQLite, etc.) — Koog doesn't bundle drivers.

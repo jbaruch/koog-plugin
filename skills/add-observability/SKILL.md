@@ -1,7 +1,7 @@
 ---
 name: add-observability
 description: >
-  Install OpenTelemetry observability into a Koog 1.0 agent — the multiplatform
+  Install OpenTelemetry observability into a Koog 1.2 agent — the multiplatform
   feature, the GenAI span/metric vocabulary, and one of the built-in backend
   integrations (Langfuse, Weave, Datadog, raw OTLP). Use when the user asks to
   "add telemetry", "wire up observability", "send traces to Langfuse", "add OpenTelemetry",
@@ -15,7 +15,7 @@ Process steps in order. Do not skip ahead.
 ## Step 1 — Add the Dependency
 
 ```kotlin
-implementation("ai.koog:agents-features-opentelemetry:1.0.0")
+implementation("ai.koog:agents-features-opentelemetry:1.2.0")
 ```
 
 The umbrella `koog-agents` does not include observability — add it explicitly.

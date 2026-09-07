@@ -1,7 +1,7 @@
 ---
 name: add-rag
 description: >
-  Add Retrieval-Augmented Generation to a Koog 1.0 agent — pick an embedding source
+  Add Retrieval-Augmented Generation to a Koog 1.2 agent — pick an embedding source
   (LLM-backed or local), index documents into a vector store, and query the store
   inside the agent's prompt pipeline or as a tool. Use when the user asks to "add
   RAG", "embed and search documents", "use a vector store", "build retrieval-augmented
@@ -17,10 +17,10 @@ Process steps in order. Do not skip ahead.
 RAG in Koog spans three concerns — each is its own module:
 
 ```kotlin
-implementation("ai.koog:embeddings-base:1.0.0")
-implementation("ai.koog:embeddings-llm:1.0.0")     // LLM-backed embeddings (OpenAI/Google/etc.)
-implementation("ai.koog:rag-base:1.0.0")
-implementation("ai.koog:rag-vector:1.0.0")         // vector store + similarity search
+implementation("ai.koog:embeddings-base:1.2.0")
+implementation("ai.koog:embeddings-llm:1.2.0")     // LLM-backed embeddings (OpenAI/Google/etc.)
+implementation("ai.koog:rag-base:1.2.0")
+implementation("ai.koog:rag-vector:1.2.0-beta")         // vector store + similarity search
 ```
 
 Reach past these only for backend-specific vector stores (Pinecone, Qdrant, etc.) — those usually ship as separate `rag-vector-<backend>` artifacts when supported.

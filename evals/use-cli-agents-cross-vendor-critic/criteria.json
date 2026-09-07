@@ -1,0 +1,36 @@
+{
+  "context": "Tests CliAIAgent for subscription-backed, cross-vendor review composed into a graph. The constraint 'there is no API key and there will not be one' is the whole point: solutions that add an Anthropic PromptExecutor ignore it. The fail-closed requirement is stated explicitly in the task and maps to structuredResult being nullable.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Uses CliAIAgent.claude with outputClass",
+      "max_score": 25,
+      "description": "Constructs the reviewer via CliAIAgent.claude(..., outputClass = Critique::class, ...) to get a typed CliAgentStructuredResponse<Critique>. Does NOT add an Anthropic PromptExecutor or AnthropicLLMClient — the task states no API key exists, so any API-key-based solution fails the requirement outright"
+    },
+    {
+      "name": "apiKey is null, and says why",
+      "max_score": 20,
+      "description": "Leaves apiKey null (or omits it) and identifies that this is what makes the CLI use its own subscription login. Passing a key sets ANTHROPIC_API_KEY in the child environment and overrides the subscription — the opposite of what was asked"
+    },
+    {
+      "name": "Fails closed on a null critique",
+      "max_score": 20,
+      "description": "Branches with structuredResult?.approved == true for the approval edge, so a null (crashed, timed out, or unparseable) reviewer routes to rejection. Using !=false, !!, or assuming non-null approves on failure and violates the explicit requirement"
+    },
+    {
+      "name": "Composes with asNode and imports it",
+      "max_score": 15,
+      "description": "Wires the agent into the strategy with .asNode(), including the ai.koog.agents.cli.asNode import — asNode is an extension function and the code does not compile without it"
+    },
+    {
+      "name": "agents-cli on the beta version line",
+      "max_score": 10,
+      "description": "Adds ai.koog:agents-cli:1.2.0-beta. The artifact does not publish at 1.2.0"
+    },
+    {
+      "name": "Scopes the workspace",
+      "max_score": 10,
+      "description": "Sets workspace to a scratch/temp directory rather than leaving the default '.'. CLI coding agents read their working directory, so a pipeline step left at the default takes an uncontrolled dependency on nearby project files"
+    }
+  ]
+}

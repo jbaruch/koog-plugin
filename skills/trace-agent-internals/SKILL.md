@@ -2,7 +2,7 @@
 name: trace-agent-internals
 description: >
   Install the `agents-features-trace` feature to capture detailed internal trace
-  events from a Koog 1.0 agent — node entries, edge transitions, planner decisions,
+  events from a Koog 1.2 agent — node entries, edge transitions, planner decisions,
   feature lifecycle. Distinct from OpenTelemetry (production signal, GenAI vocabulary)
   and event handlers (high-level callbacks). Use when the user asks to "debug what
   the strategy is doing", "trace internal agent decisions", "see why the planner
@@ -28,7 +28,7 @@ Proceed immediately to Step 2.
 ## Step 2 — Add the Dependency
 
 ```kotlin
-implementation("ai.koog:agents-features-trace:1.0.0")
+implementation("ai.koog:agents-features-trace:1.2.0")
 ```
 
 Consider scoping it to a debug build variant (Gradle `debugImplementation` for Android, a `debug` source set for plain JVM) — production binaries don't need this feature on the classpath.

@@ -1,7 +1,7 @@
 ---
 name: wire-spring-boot
 description: >
-  Wire Koog 1.0 into a Spring Boot application via `koog-spring-boot-starter` —
+  Wire Koog 1.2 into a Spring Boot application via `koog-spring-boot-starter` —
   per-provider autoconfig, `MultiLLMAutoConfiguration` aggregation, and the
   `application.yml` shape for agent name, model, system prompt, and tools (including
   MCP entries). Use when the user asks to "use Koog in Spring Boot", "wire the Spring
@@ -15,7 +15,7 @@ Process steps in order. Do not skip ahead.
 ## Step 1 — Add the Starter
 
 ```kotlin
-implementation("ai.koog:koog-spring-boot-starter:1.0.0")
+implementation("ai.koog:koog-spring-boot-starter:1.2.0-beta")
 ```
 
 The starter auto-configures one `LLMClient` bean per enabled provider and one `MultiLLMPromptExecutor` aggregating them. Adding it transitively pulls the per-provider auto-configurations.

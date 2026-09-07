@@ -1,7 +1,7 @@
 ---
 name: wire-a2a
 description: >
-  Wire the Agent-to-Agent (A2A) protocol — expose a Koog 1.0 agent as an A2A server,
+  Wire the Agent-to-Agent (A2A) protocol — expose a Koog 1.2 agent as an A2A server,
   or consume a remote A2A server as a client (typically to make a remote agent
   callable as a tool by a local agent). Use when the user asks to "expose the
   agent via A2A", "use A2A protocol", "call a remote agent", "register an A2A
@@ -22,8 +22,8 @@ Available actions:
 Add the dependencies:
 
 ```kotlin
-implementation("ai.koog:a2a-core:1.0.0")
-implementation("ai.koog:a2a-server:1.0.0")
+implementation("ai.koog:a2a-core:1.2.0-beta")
+implementation("ai.koog:a2a-server:1.2.0-beta")
 ```
 
 Construct the agent normally, then wrap it in an A2A server:
@@ -56,8 +56,8 @@ Finish here.
 Add the client dependency:
 
 ```kotlin
-implementation("ai.koog:a2a-core:1.0.0")
-implementation("ai.koog:a2a-client:1.0.0")
+implementation("ai.koog:a2a-core:1.2.0-beta")
+implementation("ai.koog:a2a-client:1.2.0-beta")
 ```
 
 Build a client and use it inside the local agent — typically wrapped as a tool, so the local LLM can decide when to delegate to the remote agent:

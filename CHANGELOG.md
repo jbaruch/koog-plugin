@@ -1,6 +1,140 @@
 # Changelog
 
-All notable changes to this tile are documented here. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
+All notable changes to this plugin are documented here. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
+
+## [0.5.0] — 2026-09-07
+
+Retargets the plugin from Koog 1.0 to **Koog 1.2.0** (released 2026-08-28) and covers the
+two surfaces added since 1.0. Findings below were produced by building a four-round
+agent against 1.2.0 end to end; each coordinate and package path was verified by
+compiling, not by reading release notes.
+
+### Added
+
+- `use-agent-skills` — the `skills` module Koog shipped in **1.2.0**, implementing the
+  Agent Skills specification (agentskills.io): `discoverSkills` / `generateSkillsPrompt`,
+  the SKILL.md frontmatter contract, the required `agents-ext` file tools, and
+  disclose-before-apply so the tool trace shows which skill fired. Evals:
+  `use-agent-skills-runtime-catalog`
+- `use-cli-agents` — `CliAIAgent`, added in **1.1.1**: drives Claude Code / Codex / an
+  arbitrary binary on subscription auth (`apiKey = null`) and composes via `.asNode()`.
+  Covers the named-`generateRequest` trap, the workspace-scoping requirement, and
+  fail-closed branching on the nullable `structuredResult`. Evals:
+  `use-cli-agents-cross-vendor-critic`, `use-cli-agents-refuses-plain-llm-call`
+
+### Changed
+
+- `rules/module-coordinates.md` retargeted to 1.2 and restructured around the failure
+  that actually costs build cycles — **two version lines**. The umbrella is `1.2.0`;
+  MCP, CLI agents, skills, the Google client, `prompt-executor-llms-all`, long-term
+  memory, `agents-ext` and `koog-agents-additions` publish **only** at `1.2.0-beta`.
+  The rule now carries the coordinate table instead of prose
+- **New:** documented that the umbrella does not bundle the Google provider. Gemini
+  needs both `prompt-executor-google-client` and `prompt-executor-llms-all`, both beta.
+  The symptom is `Unresolved reference 'google'` while `AIAgent` itself resolves, which
+  reads as a broken install rather than a missing dependency
+- **New:** a package-location table for symbols that are not where they look like they
+  should be — `McpServerInfo` under `.metadata`, `TextDocument` as an *interface* in
+  `ai.koog.rag.base` with no constructor, `SimilaritySearchStrategy` under
+  `longtermmemory.retrieval.search`, the file tools in `agents-ext`, `toolName` (not
+  `tool.name`) on tool events, `ToolRegistry.tools` returning `ToolBase`, and
+  `forwardTo` being a builder member that must **not** be imported
+- **New:** `rules/agent-construction.md` now documents the iteration cap honestly. It is
+  one underlying value, `AIAgentConfig.maxAgentIterations`, reached under two different
+  parameter names. The convenience `AIAgent(...)` overloads expose it as `maxIterations`
+  and default it to **50**; the `agentConfig` overloads expose no cap at all; and
+  `AIAgentConfig.withSystemPrompt(...)` defaults `maxAgentIterations` to **3**. Passing
+  the name `maxAgentIterations` to a convenience overload matches nothing, and the
+  compiler then reports a cascade of unrelated errors inside the trailing lambda, which
+  sends you hunting in the wrong file. Verified against the 1.2.0 sources of
+  `AIAgentFactory.kt` and `AIAgentConfig.kt`
+- **New:** `author-strategy` now bounds its verify/fix loop. `subgraphWithVerification`
+  will reject indefinitely when the drafting phase cannot satisfy it, surfacing as
+  `AIAgentMaxNumberOfIterationsReachedException` — an unrecoverable hang wearing a
+  safety feature's clothes. The exhaustion edge terminates with an explicit unapproved
+  outcome rather than shipping the last draft as if it had passed; a critic whose
+  rejection is indistinguishable from an approval is decorative
+
+### Fixed
+
+- Removed the `-jvm` suffix guidance for Gradle consumers. At 1.2 the bare coordinate
+  (`ai.koog:agents-mcp:1.2.0-beta`) resolves the JVM variant through Gradle Module
+  Metadata; the suffix is now Maven-only. The old rule sent Gradle users to an artifact
+  they did not need
+- Plugin summary and every skill description now say Koog 1.2 rather than Koog 1.0
+- `skills/wire-mcp-server` still pinned MCP at `1.0.0-beta` and still demanded the `-jvm`
+  suffix, in both Step 2 and the server section — directly contradicting the retargeted
+  coordinate rule three files away. An agent loading both got opposite instructions
+- `README.md` labelled its authority link "Koog 1.2.0 source" while pointing at
+  `tree/1.0.0`, and cited the v1.0.0 release notes. Consumers resolving an API
+  disagreement were sent to the wrong release. Both targets now resolve to 1.2.0
+- `README.md`'s `module-coordinates` summary row still described the 1.0 contract
+  (`1.0+`, `-jvm` suffix). It now matches the rule it summarizes
+- `README.md` skills tables gained the two new rows; `use-agent-skills` and
+  `use-cli-agents` shipped in the manifest but were invisible on the entrypoint
+- `Step 0` in both new skills redirected unsuitable requests to another skill and then
+  fell through into installing the dependency anyway. Both redirects are now terminal
+- `add-tool`'s description referred to `scaffold-agent` in prose instead of a typed
+  `Skill(skill: ...)` call — the only prose cross-skill reference left in the plugin
+- `migrate-from-0-x` told readers to set every `ai.koog:*` artifact to one version
+  string, which cannot work across two version lines
+
+### Evals
+
+Partial run — **20 of 50 scenarios**, on the publish-time default solver
+`claude:deepseek-v4-flash`. The workspace ran out of credit mid-run, so this is a
+subset, not a suite result, and it is not comparable to the whole-suite numbers in
+earlier releases.
+
+- **75% with the plugin against 34% without**, across the 20 scenarios that scored both
+  arms. Mean rubric points 14.0 against 5.4, mean lift **+8.6**
+- Largest lifts land where the plugin does its actual work — routing a request to the
+  right primitive: `persist-chat-history-refuses-fact-store` +25,
+  `persist-chat-history-jdbc` +20, `use-llm-node-variants-streaming` +20,
+  `snapshot-and-restore-refuses-crash` +19
+- Near-zero lift on stable-API scenarios (`add-observability-langfuse`,
+  `manage-state-tldr-mid-phase`, both +0) is the expected shape: a competent model
+  already writes correct Koog for APIs that did not change. Not a scenario defect
+- Two negatives, `migrate-from-0-x-agentmemory-removal` −14 and
+  `use-attachments-image-input` −11, both with a plugin-arm score of 0. That is the
+  signature of the harness stub failure (solution directory left pristine), not a
+  regression. Re-run before reading anything into them
+
+**The three scenarios added in this release are unmeasured.**
+`use-agent-skills-runtime-catalog` and `use-cli-agents-cross-vendor-critic` never scored
+either arm; `use-cli-agents-refuses-plain-llm-call` scored 20/20 on the plugin arm but
+its baseline never ran, so there is no lift figure. 0.5.0's new surface has not been
+evaluated — treat the headline as covering the pre-existing skills only.
+
+### Manifest and terminology
+
+- Migrated `tile.json` to `.tessl-plugin/plugin.json` via `tessl plugin migrate`. The
+  publish workflow's path filter and display name follow it. `keywords` and `entrypoint`
+  were carried across by hand — the migration drops them
+- "Tile" is retired throughout in favour of **agentic context plugin**. Renamed the
+  repository to `jbaruch/koog-plugin`. Literal `tessl` CLI invocations, registry URLs,
+  and the badge endpoint are unchanged: those are commands and addresses, not
+  terminology
+
+### Notes moved off the loaded surfaces
+
+Detail trimmed from skills and rules under `context-writing-style`'s What to Cut, kept
+here because it is the evidence behind the directives:
+
+- CLI agent latency, measured against 1.2.0-beta on one prompt: `claude` ~11s, `codex`
+  ~38s, `grok` ~66s, against ~2-3s for a direct API call. This is the number behind
+  "one to two orders of magnitude slower" and the 10-60s step budget
+- Why `use-cli-agents` insists on a scratch workspace: asked only to emit a JSON object,
+  a real CLI listed the project directory, found a spec file, read it, and used its
+  contents to get the answer right. Impressive, and also a pipeline stage silently
+  taking a dependency on whatever files happen to be nearby
+- The `-jvm` rule reversed between 0.4.x and 0.5.0. Earlier versions of
+  `module-coordinates` instructed `ai.koog:agents-mcp-jvm`; at 1.2 Gradle Module
+  Metadata resolves the JVM variant from the bare coordinate, and the suffix is needed
+  only by Maven, which does not read that metadata
+- `rules/module-coordinates.md` no longer carries Kotlin examples. Rule Format allows
+  code blocks only for specific commands, so the iteration example moved into
+  `rules/agent-construction.md` as prose and the critic loop into `author-strategy`
 
 ## [0.4.10] — 2026-05-31
 

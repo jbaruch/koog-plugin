@@ -1,0 +1,36 @@
+{
+  "context": "Tests whether the agent reaches for the Koog 1.2 skills module (runtime-discovered capability bundles) rather than a tool, an enum, or a hard-coded prompt map — and whether it gets the two dependency lines, the frontmatter contract, and the disclosure requirement right. Building this with @Tool or a when-branch is the failure mode: it satisfies the words but not the no-recompile requirement.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Uses discoverSkills + generateSkillsPrompt",
+      "max_score": 25,
+      "description": "Calls discoverSkills(...) over a skills root and feeds generateSkillsPrompt(...) output into the agent's system prompt. Does NOT hard-code the behaviours as tools, an enum, or a map of prompts — those all require a recompile and fail the stated requirement"
+    },
+    {
+      "name": "Both dependencies on the beta version line",
+      "max_score": 15,
+      "description": "Adds ai.koog:skills:1.2.0-beta AND ai.koog:agents-ext:1.2.0-beta. Both are required (agents-ext supplies the file tools) and neither exists at 1.2.0. Adding only the skills module, or pinning either to 1.2.0, does not build"
+    },
+    {
+      "name": "SKILL.md frontmatter contract is correct",
+      "max_score": 20,
+      "description": "The example file has YAML frontmatter with non-blank name and description, and the name matches its parent directory name. States or demonstrates the directory-per-skill layout. A mismatched name is silently ignored at discovery, so getting this wrong produces an agent that finds nothing"
+    },
+    {
+      "name": "Registers the file tools",
+      "max_score": 15,
+      "description": "Registers ListDirectoryTool and ReadFileTool from ai.koog.agents.ext.tool.file in the ToolRegistry so the agent can actually read a skill body, not just see the catalog"
+    },
+    {
+      "name": "Read-only file provider",
+      "max_score": 10,
+      "description": "Uses JVMFileSystemProvider.ReadOnly for discovery and for the tools. Skill bodies are instructions the model follows; a writable provider lets a skill rewrite the skills directory"
+    },
+    {
+      "name": "Instructs the agent to disclose before applying",
+      "max_score": 15,
+      "description": "The system prompt tells the agent to list the directory and read the SKILL.md before acting, which is what makes the tool trace answer the team's 'which behaviour fired?' question. Merely embedding the catalog does not satisfy the stated observability requirement"
+    }
+  ]
+}

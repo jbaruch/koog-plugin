@@ -1,7 +1,7 @@
 ---
 name: define-prompt
 description: >
-  Author prompts for a Koog 1.0 agent using the `prompt { ... }` DSL — system messages,
+  Author prompts for a Koog 1.2 agent using the `prompt { ... }` DSL — system messages,
   user turns, few-shot examples, mixed media, and runtime augmentation via the
   `SystemPromptAugmenter` / `UserPromptAugmenter` family. Use when the user asks to
   "write a system prompt with examples", "add few-shot examples", "build a prompt",

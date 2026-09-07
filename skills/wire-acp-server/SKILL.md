@@ -1,7 +1,7 @@
 ---
 name: wire-acp-server
 description: >
-  Expose a Koog 1.0 agent through the Agent Client Protocol (ACP) — the lower-level
+  Expose a Koog 1.2 agent through the Agent Client Protocol (ACP) — the lower-level
   bidirectional protocol used by tooling that needs fine-grained control over agent
   invocation lifecycle (cancellation, streaming progress, multi-turn negotiation).
   Use when the user asks to "expose the agent via ACP", "use Agent Client Protocol",
@@ -27,7 +27,7 @@ Proceed immediately to Step 2.
 ## Step 2 — Add the Dependency
 
 ```kotlin
-implementation("ai.koog:agents-features-acp:1.0.0")
+implementation("ai.koog:agents-features-acp:1.2.0-beta")
 ```
 
 Proceed immediately to Step 3.

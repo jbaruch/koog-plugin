@@ -1,20 +1,20 @@
-name: Publish Tile
+name: Publish Plugin
 
 # Thin caller for the canonical fleet publish pipeline
 # (jbaruch/coding-policy#206). publish-mode: as-is keeps koog's deliberate
 # no-auto-bump contract (`tessl plugin publish` of the manifest version;
 # a missing human bump surfaces as a red "version exists" run). Display name
-# and the tile-content path filter are preserved.
+# and the plugin-content path filter are preserved.
 
 on:
   push:
     branches: [main]
-    # Only fire when tile-content paths change (mirrors the tile payload).
+    # Only fire when plugin-content paths change (mirrors the published payload).
     paths:
       - 'rules/**'
       - 'skills/**'
       - 'evals/**'
-      - 'tile.json'
+      - '.tessl-plugin/plugin.json'
       - 'README.md'
       - 'CHANGELOG.md'
       - '.tesslignore'
@@ -32,3 +32,9 @@ jobs:
     with:
       publish-mode: as-is
       skill-review-credit-outage: skip
+      # The jbaruch workspace is out of eval credits, so a publish that also
+      # uploads scenarios lands the artifact and then fails on the eval run.
+      # Consumers get the version from here; the eval numbers come from a
+      # private copy published under a workspace that has credit, and land in
+      # the CHANGELOG. Flip back to false when jbaruch has credit again.
+      skip-evals: true

@@ -1,7 +1,7 @@
 ---
 name: add-structured-output
 description: >
-  Get typed structured output from a Koog 1.0 agent — pick between
+  Get typed structured output from a Koog 1.2 agent — pick between
   `nodeLLMRequestStructured` (graph DSL, schema-driven JSON) and `responseProcessor`
   (top-level on the agent factory, simpler shape). Defines the `@Serializable`
   output class and wires it into the strategy or the factory. Use when the user

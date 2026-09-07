@@ -1,4 +1,4 @@
-# Pre-commit hooks for jbaruch/koog-tessl
+# Pre-commit hooks for jbaruch/koog-plugin
 #
 # Required by jbaruch/coding-policy: no-secrets — blocks commits that contain
 # secret-like patterns before they land on a branch.
