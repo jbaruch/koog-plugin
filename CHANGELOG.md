@@ -2,6 +2,23 @@
 
 All notable changes to this plugin are documented here. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [0.5.1] — 2026-09-07
+
+Documentation only. No skill, rule, manifest or eval-scenario content differs from 0.5.0.
+
+### Fixed
+
+- The eval figures in 0.5.0's CHANGELOG were wrong. They were written from an in-flight
+  snapshot taken while the run still reported `pending`, on the assumption that credit
+  exhaustion had stopped it at 20 scenarios. It had not — the run continued to **46 of
+  50** complete pairs before ending. Published: "20 of 50", "75% against 34%", mean lift
+  "+8.6". Actual: 46 of 50, **77% against 44%**, mean lift **+6.1**
+- 0.5.0 also claimed all three newly added scenarios were unmeasured. Two of them
+  completed: `use-cli-agents-cross-vendor-critic` **+13**, and
+  `use-cli-agents-refuses-plain-llm-call` +0 from a 20/20 baseline. Only
+  `use-agent-skills-runtime-catalog` is genuinely unmeasured
+- The 0.5.0 section above now carries the final numbers
+
 ## [0.5.0] — 2026-09-07
 
 Retargets the plugin from Koog 1.0 to **Koog 1.2.0** (released 2026-08-28) and covers the
@@ -81,30 +98,35 @@ compiling, not by reading release notes.
 
 ### Evals
 
-Partial run — **20 of 50 scenarios**, on the publish-time default solver
-`claude:deepseek-v4-flash`. The workspace ran out of credit mid-run, so this is a
-subset, not a suite result, and it is not comparable to the whole-suite numbers in
-earlier releases.
+Run of the full 50-scenario suite on the publish-time default solver
+`claude:deepseek-v4-flash`. The workspace exhausted its credit before the last four
+scenarios, so the run ended `failed` with **46 of 50 scenarios scoring both arms**.
 
-- **75% with the plugin against 34% without**, across the 20 scenarios that scored both
-  arms. Mean rubric points 14.0 against 5.4, mean lift **+8.6**
+- **77% with the plugin against 44% without.** Mean rubric points 13.8 against 7.7,
+  mean lift **+6.1** across the 46 complete pairs
 - Largest lifts land where the plugin does its actual work — routing a request to the
   right primitive: `persist-chat-history-refuses-fact-store` +25,
   `persist-chat-history-jdbc` +20, `use-llm-node-variants-streaming` +20,
-  `snapshot-and-restore-refuses-crash` +19
-- Near-zero lift on stable-API scenarios (`add-observability-langfuse`,
-  `manage-state-tldr-mid-phase`, both +0) is the expected shape: a competent model
-  already writes correct Koog for APIs that did not change. Not a scenario defect
-- Two negatives, `migrate-from-0-x-agentmemory-removal` −14 and
-  `use-attachments-image-input` −11, both with a plugin-arm score of 0. That is the
-  signature of the harness stub failure (solution directory left pristine), not a
-  regression. Re-run before reading anything into them
+  `snapshot-and-restore-fork-branches` +20, `snapshot-and-restore-refuses-crash` +19
+- **`use-cli-agents-cross-vendor-critic` +13** (4 → 17), the strongest result among the
+  scenarios this release adds. `use-cli-agents-refuses-plain-llm-call` scored 20/20 on
+  both arms (+0): the baseline model already refuses to reach for a CLI agent on an
+  ordinary LLM call, so that scenario confirms the skill does not *regress* a correct
+  instinct rather than demonstrating lift
+- Near-zero lift on stable-API scenarios (`add-rag-docs-search`,
+  `add-observability-langfuse`, `manage-state-tldr-mid-phase`, `author-strategy-import-shapes`,
+  all +0) is the expected shape: a competent model already writes correct Koog for APIs
+  that did not change. Not a scenario defect
+- Four negatives — `scaffold-agent-anthropic-existing-dir` −17,
+  `migrate-from-0-x-agentmemory-removal` −14, `use-attachments-image-input` −11,
+  `test-koog-agents-deterministic` −10 — all with a plugin-arm score of exactly 0. That
+  is the signature of the harness stub failure (solution directory left pristine), not a
+  regression, and 4 of 46 matches the ~8% stub rate seen on the 0.4.7 run. Re-run before
+  reading anything into them
 
-**The three scenarios added in this release are unmeasured.**
-`use-agent-skills-runtime-catalog` and `use-cli-agents-cross-vendor-critic` never scored
-either arm; `use-cli-agents-refuses-plain-llm-call` scored 20/20 on the plugin arm but
-its baseline never ran, so there is no lift figure. 0.5.0's new surface has not been
-evaluated — treat the headline as covering the pre-existing skills only.
+`use-agent-skills-runtime-catalog` is the one scenario added in this release that never
+completed: its baseline arm scored but the plugin arm did not run before credit ran out.
+The `skills`-module surface is therefore unmeasured.
 
 ### Manifest and terminology
 
