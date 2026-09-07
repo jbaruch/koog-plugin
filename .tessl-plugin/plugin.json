@@ -1,6 +1,6 @@
 {
   "name": "jbaruch/koog",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Koog 1.2 idioms, gotchas, and scaffolding skills for Kotlin agents on the JVM",
   "private": false,
   "entrypoint": "README.md",
