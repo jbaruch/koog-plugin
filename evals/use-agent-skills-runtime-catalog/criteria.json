@@ -1,5 +1,5 @@
 {
-  "context": "Tests whether the agent reaches for the Koog 1.2 skills module (runtime-discovered capability bundles) rather than a tool, an enum, or a hard-coded prompt map — and whether it gets the two dependency lines, the frontmatter contract, and the disclosure requirement right. Building this with @Tool or a when-branch is the failure mode: it satisfies the words but not the no-recompile requirement.",
+  "context": "Tests whether the agent reaches for the Koog 1.3 skills module (runtime-discovered capability bundles) rather than a tool, an enum, or a hard-coded prompt map — and whether it gets the two dependency lines, the frontmatter contract, and the disclosure requirement right. Building this with @Tool or a when-branch is the failure mode: it satisfies the words but not the no-recompile requirement.",
   "type": "weighted_checklist",
   "checklist": [
     {
@@ -10,7 +10,7 @@
     {
       "name": "Both dependencies on the beta version line",
       "max_score": 15,
-      "description": "Adds ai.koog:skills:1.2.0-beta AND ai.koog:agents-ext:1.2.0-beta. Both are required (agents-ext supplies the file tools) and neither exists at 1.2.0. Adding only the skills module, or pinning either to 1.2.0, does not build"
+      "description": "Adds ai.koog:skills:1.3.0-beta AND ai.koog:agents-ext:1.3.0-beta. Both are required (agents-ext supplies the file tools) and neither exists at 1.3.0. Adding only the skills module, or pinning either to 1.3.0, does not build"
     },
     {
       "name": "SKILL.md frontmatter contract is correct",

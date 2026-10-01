@@ -40,10 +40,10 @@ Proceed to Step 1.
 Path: `build.gradle.kts`
 
 ```kotlin
-implementation("ai.koog:agents-cli:1.2.0-beta")
+implementation("ai.koog:agents-cli:1.3.0-beta")
 ```
 
-Beta version line, not `1.2.0`.
+Beta version line, not `1.3.0`.
 
 Proceed immediately to Step 2.
 

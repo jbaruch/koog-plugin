@@ -2,7 +2,7 @@
 
 ## Problem/Feature Description
 
-A team runs a Koog 1.2 agent that rewrites outbound customer messages. Their support
+A team runs a Koog 1.3 agent that rewrites outbound customer messages. Their support
 leads keep asking for new rewriting behaviours — a refund-apology tone, a
 security-incident tone, a churn-risk tone — and today each one is a code change and a
 deploy.

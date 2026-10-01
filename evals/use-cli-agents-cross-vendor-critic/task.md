@@ -2,7 +2,7 @@
 
 ## Problem/Feature Description
 
-A Koog 1.2 pipeline drafts outbound messages with a Gemini model and then has a second
+A Koog 1.3 pipeline drafts outbound messages with a Gemini model and then has a second
 step decide whether each draft is safe to send. The team has noticed the reviewer is
 too generous: it is the same model family that wrote the draft, and it approves almost
 everything.

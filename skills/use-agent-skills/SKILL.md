@@ -1,7 +1,7 @@
 ---
 name: use-agent-skills
 description: >
-  Give a Koog 1.2 agent capability bundles it discovers from the filesystem at
+  Give a Koog 1.3 agent capability bundles it discovers from the filesystem at
   runtime, using the `skills` module that implements the Agent Skills
   specification (agentskills.io). Discovers SKILL.md files, generates a catalog
   prompt block, and registers the file tools the agent needs to disclose and
@@ -37,8 +37,8 @@ The umbrella does not pull either of these. Both are on the **beta version line*
 Path: `build.gradle.kts`
 
 ```kotlin
-implementation("ai.koog:skills:1.2.0-beta")       // discoverSkills, generateSkillsPrompt
-implementation("ai.koog:agents-ext:1.2.0-beta")   // ReadFileTool, ListDirectoryTool
+implementation("ai.koog:skills:1.3.0-beta")       // discoverSkills, generateSkillsPrompt
+implementation("ai.koog:agents-ext:1.3.0-beta")   // ReadFileTool, ListDirectoryTool
 ```
 
 `agents-ext` is required, not optional: without file tools the agent can see the

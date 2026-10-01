@@ -1,13 +1,13 @@
 ---
 name: wire-mcp-server
 description: >
-  Connect a Koog 1.2 agent to an MCP (Model Context Protocol) server, using the
+  Connect a Koog 1.3 agent to an MCP (Model Context Protocol) server, using the
   primary Streamable HTTP transport — or fall back to SSE / stdio when the
   remote server doesn't speak Streamable HTTP yet. Adds the agents-mcp dependency,
   builds a ToolRegistry from the MCP server's exposed tools, and merges it with
   the agent's existing tool registry. Use when the user asks to "connect to an
   MCP server", "use the GitHub MCP server", "add MCP tools to my agent", "wire
-  Playwright MCP" or similar. Assumes a scaffolded Koog 1.2 project.
+  Playwright MCP" or similar. Assumes a scaffolded Koog 1.3 project.
 ---
 
 # Wire MCP Server Skill
@@ -31,12 +31,12 @@ Proceed immediately to Step 2.
 Open `build.gradle.kts` and confirm the MCP client artifact is in the dependencies block. The umbrella `ai.koog:koog-agents` does not pull MCP — it must be added explicitly. If absent, add it:
 
 ```kotlin
-implementation("ai.koog:agents-mcp:1.2.0-beta")
+implementation("ai.koog:agents-mcp:1.3.0-beta")
 ```
 
 **Two gotchas the umbrella version hides:**
 
-- `agents-mcp` (and `agents-mcp-server`) publish only on the **beta version line**. `1.2.0` does not exist for them — pin `1.2.0-beta`. See `rules/module-coordinates.md`.
+- `agents-mcp` (and `agents-mcp-server`) publish only on the **beta version line**. `1.3.0` does not exist for them — pin `1.3.0-beta`. See `rules/module-coordinates.md`.
 - Use the **bare coordinate on Gradle** (`ai.koog:agents-mcp`). Gradle Module Metadata resolves the JVM variant. Only Maven consumers need the `-jvm` suffix.
 
 Re-run `./gradlew --refresh-dependencies` if the project is already imported into the IDE.
@@ -131,7 +131,7 @@ Use when the user asks to "expose tools over MCP", "build an MCP server", or "pu
 Add the server module:
 
 ```kotlin
-implementation("ai.koog:agents-mcp-server:1.2.0-beta")
+implementation("ai.koog:agents-mcp-server:1.3.0-beta")
 ```
 
 Same beta-line and Gradle-vs-Maven coordinate gotchas from Step 2 apply.

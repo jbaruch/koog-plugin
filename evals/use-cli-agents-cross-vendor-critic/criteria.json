@@ -25,7 +25,7 @@
     {
       "name": "agents-cli on the beta version line",
       "max_score": 10,
-      "description": "Adds ai.koog:agents-cli:1.2.0-beta. The artifact does not publish at 1.2.0"
+      "description": "Adds ai.koog:agents-cli:1.3.0-beta. The artifact does not publish at 1.3.0"
     },
     {
       "name": "Scopes the workspace",
