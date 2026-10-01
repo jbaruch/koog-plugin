@@ -20,7 +20,7 @@
     {
       "name": "Adds the planner module dependency",
       "max_score": 15,
-      "description": "Adds ai.koog:agents-planner at 1.0.0+ to build.gradle.kts. The umbrella does not include it"
+      "description": "Adds ai.koog:agents-planner at 1.3.0-beta to build.gradle.kts. The umbrella does not include it"
     },
     {
       "name": "Sets maxIterations well above the default",

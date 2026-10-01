@@ -1,5 +1,5 @@
 {
-  "context": "Tests whether the agent selects ACP — not A2A (agent-to-agent RPC) or MCP (tool host) — for a tooling client that drives an agent's run lifecycle with cancellation and progress streaming, then wires the ACP feature correctly. A baseline with no Koog 1.0 knowledge does not know Koog exposes an ACP feature at all, and tends to reach for a generic HTTP/RPC layer or conflate it with MCP.",
+  "context": "Tests whether the agent selects ACP — not A2A (agent-to-agent RPC) or MCP (tool host) — for a tooling client that drives an agent's run lifecycle with cancellation and progress streaming, then wires the ACP feature correctly. A baseline with no Koog 1.3 knowledge does not know Koog exposes an ACP feature at all, and tends to reach for a generic HTTP/RPC layer or conflate it with MCP.",
   "type": "weighted_checklist",
   "checklist": [
     {
@@ -10,7 +10,7 @@
     {
       "name": "Adds the ACP dependency",
       "max_score": 15,
-      "description": "Adds ai.koog:agents-features-acp at 1.0.0 or later to build.gradle.kts (exact group and artifact). Failure: wrong artifact name, missing dependency, or an a2a-*/mcp module"
+      "description": "Adds ai.koog:agents-features-acp at 1.3.0-beta to build.gradle.kts (exact group and artifact). Failure: wrong artifact name, missing dependency, or an a2a-*/mcp module"
     },
     {
       "name": "Correct ACP import",

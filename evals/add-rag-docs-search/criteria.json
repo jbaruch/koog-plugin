@@ -20,7 +20,7 @@
     {
       "name": "Adds the RAG and embeddings dependencies",
       "max_score": 15,
-      "description": "Adds ai.koog:rag-base, ai.koog:rag-vector, ai.koog:embeddings-base, and ai.koog:embeddings-llm at 1.0.0+. Does not skip embeddings-llm (the embedder needs it)"
+      "description": "Adds ai.koog:rag-base:1.3.0, ai.koog:rag-vector:1.3.0-beta, ai.koog:embeddings-base:1.3.0 and ai.koog:embeddings-llm:1.3.0. Does not skip embeddings-llm."
     },
     {
       "name": "Registers the search tool with the agent's ToolRegistry",

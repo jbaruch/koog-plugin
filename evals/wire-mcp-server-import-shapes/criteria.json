@@ -1,5 +1,5 @@
 {
-  "context": "Tests whether the agent produces a buildable MCP wiring — three concerns the call shape alone doesn't catch: (1) the transport builder is a top-level extension on `McpToolRegistryProvider` and needs its own import alongside the provider; (2) `agents-mcp` publishes as `1.0.0-beta`, not `1.0.0`; (3) it publishes only JVM variants, so the artifact needs the `-jvm` suffix. Agents that copy the call shape from documentation without resolving these typically produce code that does not compile or a Gradle line that fails resolution.",
+  "context": "Tests buildable Koog 1.3 MCP wiring: the transport builder needs its explicit extension import; agents-mcp publishes at 1.3.0-beta; Gradle uses the bare coordinate and resolves its JVM variant through module metadata.",
   "type": "weighted_checklist",
   "checklist": [
     {
@@ -13,14 +13,14 @@
       "description": "The produced file contains `import ai.koog.agents.mcp.fromSseUrl` (or a star-import covering the package) alongside `import ai.koog.agents.mcp.McpToolRegistryProvider`. Importing only the provider does NOT bring the transport extension into scope — `fromSseUrl` is a top-level extension function in the same package, declared separately from the provider object"
     },
     {
-      "name": "Pins the MCP artifact to `1.0.0-beta`",
+      "name": "Pins the MCP artifact to 1.3.0-beta",
       "max_score": 18,
-      "description": "The Gradle dependency uses version `1.0.0-beta` (e.g., `ai.koog:agents-mcp-jvm:1.0.0-beta`). NOT `1.0.0` — Koog 1.0's stable release did not publish `agents-mcp` at `1.0.0`; only `1.0.0-beta` is on Maven Central. An answer that pins `1.0.0` fails dependency resolution"
+      "description": "Adds ai.koog:agents-mcp:1.3.0-beta, not the nonexistent stable 1.3.0 version of this module."
     },
     {
-      "name": "Uses the `-jvm` suffix on the artifact",
+      "name": "Uses the bare Gradle artifact coordinate",
       "max_score": 18,
-      "description": "The Gradle line uses `ai.koog:agents-mcp-jvm:...` (NOT bare `ai.koog:agents-mcp:...`). `agents-mcp` publishes only JVM-specific variants at the relevant version; without the suffix Gradle KMP variant resolution cannot pick the JVM artifact and the build fails with 'could not find'"
+      "description": "Uses ai.koog:agents-mcp:1.3.0-beta without a -jvm suffix for Gradle. Gradle Module Metadata resolves the JVM variant. The -jvm suffix guidance applies to Maven consumers."
     },
     {
       "name": "Builds the registry before constructing the agent",

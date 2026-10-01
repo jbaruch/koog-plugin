@@ -10,7 +10,7 @@
     {
       "name": "Adds the agents-features-trace dependency",
       "max_score": 20,
-      "description": "Adds ai.koog:agents-features-trace at 1.0.0+. Does not add other observability modules in lieu of it"
+      "description": "Adds ai.koog:agents-features-trace at 1.3.0 with each artifact on its stable or beta line. Does not add other observability modules in lieu of it"
     },
     {
       "name": "Captures EDGE_EVALUATION events",

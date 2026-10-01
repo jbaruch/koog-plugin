@@ -22,7 +22,7 @@ alwaysApply: true
 
 ## The iteration cap has two names and two defaults
 
-The cap is one underlying value, `AIAgentConfig.maxAgentIterations`, reached by two different parameter names depending on which overload you call. Verified against 1.2.0.
+The cap is one underlying value, `AIAgentConfig.maxAgentIterations`, reached by two different parameter names depending on which overload you call. Verified against 1.3.0.
 
 - The convenience overloads (`promptExecutor` + `llmModel` + optional `systemPrompt`) expose it as **`maxIterations`, defaulting to 50**. There is no `maxAgentIterations` parameter on these — passing that name matches no overload, and the compiler then reports a cascade of unrelated errors inside the trailing lambda rather than naming the bad argument
 - The `agentConfig` overloads take no cap parameter at all. Set `maxAgentIterations` on the `AIAgentConfig` you pass in

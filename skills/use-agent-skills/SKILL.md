@@ -1,7 +1,7 @@
 ---
 name: use-agent-skills
 description: >
-  Give a Koog 1.2 agent capability bundles it discovers from the filesystem at
+  Give a Koog 1.3 agent capability bundles it discovers from the filesystem at
   runtime, using the `skills` module that implements the Agent Skills
   specification (agentskills.io). Discovers SKILL.md files, generates a catalog
   prompt block, and registers the file tools the agent needs to disclose and
@@ -17,8 +17,8 @@ Process steps in order. Do not skip ahead.
 
 ## Step 0 — Confirm this is the right tool
 
-Agent Skills are **runtime-discovered capability bundles**, read off disk on every
-run. Reach for them when the set of capabilities should change without recompiling —
+Agent Skills are **runtime-discovered capability bundles**, scanned when
+`discoverSkills` is called. Reach for them when capabilities should change without recompiling —
 a directory a non-developer drops files into, a skills repo shared across agents.
 
 If the capability is fixed at build time and typed, that is a **tool**, not a skill —
@@ -37,8 +37,8 @@ The umbrella does not pull either of these. Both are on the **beta version line*
 Path: `build.gradle.kts`
 
 ```kotlin
-implementation("ai.koog:skills:1.2.0-beta")       // discoverSkills, generateSkillsPrompt
-implementation("ai.koog:agents-ext:1.2.0-beta")   // ReadFileTool, ListDirectoryTool
+implementation("ai.koog:skills:1.3.0-beta")       // discoverSkills, generateSkillsPrompt
+implementation("ai.koog:agents-ext:1.3.0-beta")   // ReadFileTool, ListDirectoryTool
 ```
 
 `agents-ext` is required, not optional: without file tools the agent can see the
@@ -86,7 +86,12 @@ val discovered = discoverSkills(JVMFileSystemProvider.ReadOnly, listOf(skillsRoo
 ```
 
 Use `JVMFileSystemProvider.ReadOnly` — a skills directory is input, and a read-only
-provider means a prompt-injected instruction inside a SKILL.md cannot rewrite it.
+provider prevents writes through these tools. It does not restrict reads to the
+discovery roots. `ReadFileTool` accepts arbitrary absolute paths accessible to the process.
+
+The example discovers once at startup. Restart the process to load a new catalog,
+or call `discoverSkills` again and rebuild the catalog prompt and agent before the
+next run. Adding a file alone does not refresh an existing agent's system prompt.
 
 Pass **absolute** paths. Under a Gradle `run` task the working directory is the
 module directory, not the project root, so a relative root silently discovers nothing.
@@ -151,8 +156,8 @@ Confirm all four, in order:
    a relative path, a `name`/directory mismatch, or malformed frontmatter — check the
    warning log before touching anything else
 2. The agent's tool trace shows a directory listing **and** a file read before it acts
-3. Adding a new `SKILL.md` and re-running picks it up with **no recompile**. If it does
-   not, the root is wrong
+3. Adding a new `SKILL.md` appears after restart or explicit rediscovery and catalog
+   regeneration, with **no recompile**
 4. The output actually reflects the skill body, not just its description
 
 ## Security
@@ -163,5 +168,17 @@ filesystem. Treat a skills root exactly like any other untrusted input:
 - never point discovery at a directory writable by someone you would not let edit the
   system prompt
 - keep the file provider read-only
+- a discovery root is a catalog search location, not a filesystem sandbox
+- when confinement is required, validate canonical paths against an allowlisted
+  root on every tool operation
+- reject traversal and symlink escapes in confined tools
+- use OS-level isolation for attacker-controlled files
 - a skill cannot be trusted to constrain itself — enforce real limits with the tool
   registry, which the skill body cannot change
+
+For a trusted local filesystem with a confined reader, replace the default
+`ReadFileTool` / `ListDirectoryTool` registrations with the tools in:
+
+```text
+skills/use-agent-skills/references/confined-file-tools.md
+```

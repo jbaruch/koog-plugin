@@ -2,7 +2,7 @@
 
 ## Problem/Feature Description
 
-A developer has a working Koog 1.0 agent in Kotlin. They want the agent to be able to look up the current weather for a city. They already have a function in their project that does the network call:
+A developer has a working Koog 1.3 agent in Kotlin. They want the agent to be able to look up the current weather for a city. They already have a function in their project that does the network call:
 
 ```kotlin
 fun fetchWeather(city: String, units: String): String {

@@ -5,12 +5,12 @@
     {
       "name": "Uses the functional-agent factory",
       "max_score": 35,
-      "description": "Constructs via AIAgent.functional(...) (or equivalent functional factory) with an AIAgentFunctionalStrategy. Does NOT use the default AIAgent(...) graph factory and does NOT author a strategy<String, String>(\"...\") block — both would be over-engineering for the developer's stated minimal need"
+      "description": "Constructs a FunctionalAIAgent through the top-level AIAgent<String, String>(...) factory with functionalStrategy { ... }, or another verified AIAgentFunctionalStrategy implementation. Does not invent AIAgent.functional or use the default graph factory without a functional strategy. Does not add graph nodes or edges."
     },
     {
       "name": "Strategy block is a single suspending block",
       "max_score": 25,
-      "description": "The functional strategy body is a single suspending lambda that calls the LLM and returns the result. Does not contain a sub-graph, does not split work across multiple nodes (there are no nodes in a functional agent)"
+      "description": "The functional strategy is a single suspending lambda that calls requestLLM(input) and returns text from MessagePart.Text response parts. Does not invent llm.requestSingle, contain a subgraph or split work across graph nodes."
     },
     {
       "name": "Trims the LLM response inside the block",
@@ -30,7 +30,7 @@
     {
       "name": "No tools registered",
       "max_score": 5,
-      "description": "Does not pass a toolRegistry to the factory — the developer said no tools. The functional shape has no use for tools when the strategy is one-shot text-in-text-out"
+      "description": "Does not pass a toolRegistry to the factory \u2014 the developer said no tools. The functional shape has no use for tools when the strategy is one-shot text-in-text-out"
     }
   ]
 }

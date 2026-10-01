@@ -1,4 +1,4 @@
-# Migrate a Custom-Strategy Agent With a Shared HTTP Client to 1.0
+# Migrate a Custom-Strategy Agent With a Shared HTTP Client to 1.3
 
 ## Problem/Feature Description
 
@@ -72,8 +72,8 @@ fun main() = runBlocking {
 }
 ```
 
-They want to bring this project to Koog 1.0 with the same behavior — keep the shared, tuned HTTP client and the injectable clock. They're on JDK 11 today.
+They want to bring this project to Koog 1.3 with the same behavior — keep the shared, tuned HTTP client and the injectable clock. They're on JDK 11 today.
 
 ## Output Specification
 
-Walk through every change required to compile and run this against Koog 1.0. Produce the changed `build.gradle.kts`, `Strategy.kt`, and `Main.kt` as a single response, each file clearly labeled.
+Walk through every change required to compile and run this against Koog 1.3. Produce the changed `build.gradle.kts`, `Strategy.kt`, and `Main.kt` as a single response, each file clearly labeled.

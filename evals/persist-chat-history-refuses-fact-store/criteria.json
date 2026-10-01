@@ -1,26 +1,26 @@
 {
-  "context": "Negative case — tests whether the agent recognizes that the developer's data (structured, queryable, per-decision facts) belongs in a fact-storage primitive (LongTermMemory) or as a tool, NOT in chat-history. Installing JdbcChatHistory / ChatHistoryAws / ChatMemorySql here would force the agent to inject fake Message.User / Message.Assistant pseudo-turns to surface the facts, which the model misinterprets as today's conversation — the failure mode the anti-pattern in persist-chat-history Step 6 names. Weights favor functional correctness over prose explanation; a code-only refusal that picks the right primitive is the target behavior given the plugin's Path: write convention.",
+  "context": "Negative case \u2014 tests whether the agent recognizes that the developer's data (structured, queryable, per-decision facts) belongs in a fact-storage primitive (LongTermMemory) or as a tool, NOT in chat-history. Installing ChatMemory with a persistent chat-history provider here would force the agent to inject fake Message.User / Message.Assistant pseudo-turns to surface the facts, which the model misinterprets as today's conversation \u2014 the failure mode the anti-pattern in persist-chat-history Step 6 names. Weights favor functional correctness over prose explanation; a code-only refusal that picks the right primitive is the target behavior given the plugin's Path: write convention.",
   "type": "weighted_checklist",
   "checklist": [
     {
-      "name": "Does not install JdbcChatHistory / chat-history-jdbc",
+      "name": "Does not install chat-memory persistence for domain facts",
       "max_score": 35,
-      "description": "Does NOT call install(JdbcChatHistory) and does NOT add ai.koog:agents-features-chat-history-jdbc / -aws / -sql. The skill body explicitly names this as the wrong primitive; an installation here would be the anti-pattern this scenario tests refusal of. Code-only refusal is sufficient — no prose needed. An empty or missing solution does NOT satisfy this criterion: a correct refusal still produces a response, so a non-answer scores 0 here rather than passing vacuously."
+      "description": "Does NOT call install(ChatMemory) and does NOT add ai.koog:agents-features-chat-history-jdbc / -aws or agents-features-chat-memory-sql. The skill body explicitly names this as the wrong primitive; an installation here would be the anti-pattern this scenario tests refusal of. Code-only refusal is sufficient \u2014 no prose needed. An empty or missing solution does NOT satisfy this criterion: a correct refusal still produces a response, so a non-answer scores 0 here rather than passing vacuously."
     },
     {
       "name": "Recommends LongTermMemory or a Tool",
       "max_score": 30,
-      "description": "Routes the developer to ai.koog:agents-features-longterm-memory (with a SearchQueryProvider for organizer/date lookup) OR builds a @Tool like getRecentlyUsedFlavors(organizer) that the agent calls. Either is correct — both are fact-shaped primitives. Code or prose form both count"
+      "description": "Routes the developer to ai.koog:agents-features-longterm-memory (with a SearchQueryProvider for organizer/date lookup) OR builds a @Tool like getRecentlyUsedFlavors(organizer) that the agent calls. Either is correct \u2014 both are fact-shaped primitives. Code or prose form both count"
     },
     {
       "name": "Does not synthesise pseudo-turns into a custom ChatHistoryProvider",
       "max_score": 25,
-      "description": "Does NOT implement a custom ChatHistoryProvider that returns a hand-rolled list of Message.User / Message.Assistant entries representing facts the agent never actually said. This is the symptom-form of the same anti-pattern — the data isn't conversation-shaped and the model misreads the latest entry as today's task. An empty or missing solution does NOT satisfy this criterion: a correct refusal still produces a response, so a non-answer scores 0 here rather than passing vacuously."
+      "description": "Does NOT implement a custom ChatHistoryProvider that returns a hand-rolled list of Message.User / Message.Assistant entries representing facts the agent never actually said. This is the symptom-form of the same anti-pattern \u2014 the data isn't conversation-shaped and the model misreads the latest entry as today's task. An empty or missing solution does NOT satisfy this criterion: a correct refusal still produces a response, so a non-answer scores 0 here rather than passing vacuously."
     },
     {
       "name": "Names the chat-history-vs-fact-store distinction",
       "max_score": 10,
-      "description": "Surfaces (in prose OR as a code comment OR via the picked dependency line) that chat-history persistence is for real conversation turns and that the developer's data is a different shape. A one-line code comment near the LongTermMemory install satisfies this — full prose walkthrough is not required given the plugin's code-first Path: convention"
+      "description": "Surfaces (in prose OR as a code comment OR via the picked dependency line) that chat-history persistence is for real conversation turns and that the developer's data is a different shape. A one-line code comment near the LongTermMemory install satisfies this \u2014 full prose walkthrough is not required given the plugin's code-first Path: convention"
     }
   ]
 }

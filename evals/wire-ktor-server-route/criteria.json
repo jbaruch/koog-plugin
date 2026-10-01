@@ -10,7 +10,7 @@
     {
       "name": "Adds the koog-ktor dependency",
       "max_score": 20,
-      "description": "Adds ai.koog:koog-ktor at 1.0.0 or later to build.gradle.kts. The umbrella does not include the Ktor integration"
+      "description": "Adds ai.koog:koog-ktor at 1.3.0-beta to build.gradle.kts. The umbrella does not include the Ktor integration"
     },
     {
       "name": "Configures the prompt executor inside the install block",

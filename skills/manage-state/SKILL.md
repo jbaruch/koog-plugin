@@ -1,7 +1,7 @@
 ---
 name: manage-state
 description: >
-  Work with Koog 1.2 agent state — typed key-value `storage` on `AIAgentContext`,
+  Work with Koog 1.3 agent state — typed key-value `storage` on `AIAgentContext`,
   history compression strategies (TL;DR, sliding window, fact retrieval), and the
   `LongTermMemory` feature (which replaces the removed `AgentMemory`) for cross-session
   recall. Use when the user asks to "store state across nodes", "compress conversation
@@ -23,15 +23,18 @@ Available actions:
 
 `storage` on `AIAgentContext` is the typed key-value store. Keys are created once at file scope; values are read/written inside node bodies:
 
+<!-- compile-example: Storage -->
 ```kotlin
-import ai.koog.agents.core.agent.context.createStorageKey
+import ai.koog.agents.core.agent.entity.AIAgentStorage
+import ai.koog.agents.core.agent.entity.createStorageKey
 
-val unfinishedNodesKey = createStorageKey<MutableList<NodeRef>>("unfinishedNodes")
-val currentNodeKey = createStorageKey<NodeRef>("currentNode")
+val unfinishedNodesKey = createStorageKey<MutableList<String>>("unfinishedNodes")
+val currentNodeKey = createStorageKey<String>("currentNode")
 
-// inside a node body — `this` is AIAgentContext
-storage.set(currentNodeKey, ref)
-val current = storage.get(currentNodeKey)
+suspend fun rememberNode(storage: AIAgentStorage, ref: String): String? {
+    storage.set(currentNodeKey, ref)
+    return storage.get(currentNodeKey)
+}
 ```
 
 **Constraints (1.0):**
@@ -87,30 +90,52 @@ Finish here.
 Add the dependency:
 
 ```kotlin
-implementation("ai.koog:agents-features-longterm-memory:1.2.0-beta")
+implementation("ai.koog:agents-features-longterm-memory:1.3.0-beta")
 // for Bedrock AgentCore backend (one option):
-implementation("ai.koog:agents-features-longterm-memory-aws:1.2.0-beta")
+implementation("ai.koog:agents-features-longterm-memory-aws:1.3.0-beta")
 ```
 
-Install the feature inside `AIAgent(...)`'s trailing lambda:
+Install the feature inside `AIAgent(...)`'s trailing lambda. Supply a search storage
+for retrieval and a write storage for ingestion; one backend may implement both.
 
+<!-- compile-example: LongMemory -->
 ```kotlin
-import ai.koog.agents.features.longterm.memory.LongTermMemory
-import ai.koog.agents.features.longterm.memory.FailurePolicy
+import ai.koog.agents.core.agent.AIAgent
+import ai.koog.agents.longtermmemory.feature.LongTermMemory
+import ai.koog.agents.longtermmemory.feature.FailurePolicy
+import ai.koog.prompt.executor.model.PromptExecutor
+import ai.koog.prompt.executor.clients.openai.OpenAIModels
+import ai.koog.rag.base.TextDocument
+import ai.koog.rag.base.storage.SearchStorage
+import ai.koog.rag.base.storage.WriteStorage
+import ai.koog.rag.base.storage.search.SearchRequest
 
-val agent = AIAgent(
-    promptExecutor = ...,
-    llmModel = ...,
-    systemPrompt = "...",
+fun memoryAgent(
+    executor: PromptExecutor,
+    searchStorage: SearchStorage<TextDocument, SearchRequest>,
+    writeStorage: WriteStorage<TextDocument>,
+) = AIAgent(
+    promptExecutor = executor,
+    llmModel = OpenAIModels.Chat.GPT4o,
+    systemPrompt = "Retrieve relevant facts and remember this conversation.",
 ) {
     install(LongTermMemory) {
-        searchQueryProvider = ...        // was QueryExtractor pre-1.0
-        documentExtractor = ...          // was ExtractionStrategy pre-1.0
-        failurePolicy = FailurePolicy.PROPAGATE   // or .SILENTLY_SKIP, .LOG
-        // backend-specific config (Bedrock, in-process, etc.)
+        retrieval {
+            storage = searchStorage
+            failurePolicy = FailurePolicy.FAIL_FAST
+        }
+        ingestion {
+            storage = writeStorage
+            failurePolicy = FailurePolicy.LOG_AND_CONTINUE
+        }
     }
 }
 ```
+
+Set `searchQueryProvider` inside `retrieval {}` and `documentExtractor` inside
+`ingestion {}` when overriding their defaults. `FAIL_FAST` throws on a backend
+failure; `LOG_AND_CONTINUE` logs it and continues. Omit either block to disable that
+capability. An empty feature configuration enables neither capability.
 
 **1.0 renames in `LongTermMemory`** (apply when migrating):
 

@@ -1,88 +1,82 @@
 ---
 name: use-functional-agent
 description: >
-  Use `FunctionalAIAgent` — the third concrete agent subtype in Koog 1.2 (alongside
-  `GraphAIAgent` and `PlannerAIAgent`). Wraps a single suspending block, no graph DSL,
-  no planner — just programmer-written logic that calls the LLM and tools directly.
-  Use when the user asks to "skip the graph DSL", "write the agent body as plain code",
-  "use AIAgentFunctionalStrategy", or describes a one-shot agent shape that doesn't
-  warrant a topology.
+  Build a Koog 1.3 FunctionalAIAgent with the AIAgent factory and functionalStrategy.
+  Put a suspending LLM request and result transformation in ordinary Kotlin control
+  flow. Use when the user asks to "skip the graph DSL", "write the agent body as
+  plain code", "use functionalStrategy", "use AIAgentFunctionalStrategy", or build
+  a one-shot agent. For explicit nodes and edges, use GraphAIAgent instead.
 ---
 
 # Use Functional Agent Skill
 
 Process steps in order. Do not skip ahead.
 
-## Step 1 — Confirm This Is the Right Shape
+## Step 1 — Select the Agent Shape
 
-Three agent subtypes in 1.0:
-
-- **`GraphAIAgent`** — wires a strategy graph (default via `singleRunStrategy()`, custom via `strategy { ... }`). What `AIAgent(...)` returns by default
-- **`PlannerAIAgent`** — LLM-based or GOAP planner picks steps at runtime (`use-planner`)
-- **`FunctionalAIAgent`** — wraps a single suspending block. No graph, no planner — programmer writes the body directly
-
-Use functional when:
-
-- The agent's logic is one-shot and short — "call LLM with this prompt, return the result", with maybe one transformation
-- You want full Kotlin control flow without learning the strategy DSL
-- The strategy DSL feels like overkill for what amounts to a few lines
-
-Don't use functional when:
-
-- The flow needs visible topology (subgraphs, conditional edges, loops) — that's `GraphAIAgent`
-- The step order depends on runtime context — that's `PlannerAIAgent`
-- You need feature composition that depends on graph entry points — most features assume `GraphAIAgent.FeatureContext`
+- Use `FunctionalAIAgent` for a suspending Kotlin body with direct LLM requests.
+- Use `GraphAIAgent` for explicit nodes, edges and subgraphs.
+- Use `PlannerAIAgent` for runtime planning.
 
 Proceed immediately to Step 2.
 
-## Step 2 — Use the Functional Factory
+## Step 2 — Create the Functional Strategy
 
-The top-level `AIAgent(...)` factory has overloads for functional strategies. Pass an `AIAgentFunctionalStrategy` (or the inline block factory):
+Pass `functionalStrategy` to the top-level `AIAgent` factory. Supply the caller's
+executor; retain responsibility for closing that executor after its agents finish.
 
+<!-- compile-example: FunctionalAgent -->
 ```kotlin
 import ai.koog.agents.core.agent.AIAgent
-import ai.koog.agents.core.agent.AIAgentFunctionalStrategy
+import ai.koog.agents.core.agent.FunctionalAIAgent
+import ai.koog.agents.core.agent.functionalStrategy
+import ai.koog.prompt.executor.clients.openai.OpenAIModels
+import ai.koog.prompt.executor.model.PromptExecutor
+import ai.koog.prompt.message.MessagePart
 
-val agent: FunctionalAIAgent<String, String> = AIAgent.functional(
-    promptExecutor = simpleOpenAIExecutor(System.getenv("OPENAI_API_KEY")),
-    llmModel = OpenAIModels.Chat.GPT4o,
-    systemPrompt = "You translate inputs to formal English.",
-    strategy = AIAgentFunctionalStrategy { input ->
-        // input is the agent's String input; return the String output
-        val response = llm.requestSingle(input)
-        response.content.trim()
-    },
-)
+fun formalEnglishAgent(executor: PromptExecutor): FunctionalAIAgent<String, String> =
+    AIAgent<String, String>(
+        promptExecutor = executor,
+        llmModel = OpenAIModels.Chat.GPT4o,
+        systemPrompt = "Rewrite the input in formal English. Return only the rewrite.",
+        strategy = functionalStrategy {
+            val response = requestLLM(it)
+            response.parts.filterIsInstance<MessagePart.Text>()
+                .joinToString("\n") { part -> part.text }.trim()
+        },
+    )
 
-val out: String = agent.run("yo this kinda sucks")
+suspend fun rewrite(executor: PromptExecutor, input: String): String {
+    val agent = formalEnglishAgent(executor)
+    return try {
+        agent.run(input)
+    } finally {
+        agent.close()
+    }
+}
 ```
 
-Inside the strategy block, `this` is `AIAgentContext` — `llm`, `storage`, `clock` are available. You write the LLM round-trip directly; no `nodeLLMRequest`, no edges.
+The strategy receiver is `AIAgentFunctionalContext`. `requestLLM` adds the input to
+the prompt and requests a response. Read text from `MessagePart.Text` parts.
 
 Proceed immediately to Step 3.
 
-## Step 3 — Mind the Feature Limits
+## Step 3 — Check Feature Compatibility
 
-Some features expect `GraphAIAgent.FeatureContext` and don't compose with `FunctionalAIAgent`. Specifically:
-
-- Strategy-graph-aware features (subgraph hooks, edge interceptors) — N/A; there's no graph
-- Persistence checkpoints — still work for storage, but "resume from a specific node" doesn't apply (no nodes)
-- The `Trace` feature's node/edge categories produce no events for a functional agent — only top-level lifecycle events fire
-
-`OpenTelemetry`, `LongTermMemory`, `Tokenizer`, `EventHandler` work as usual.
-
-If you find yourself reaching for graph-aware features inside a functional agent, that's a signal you wanted `GraphAIAgent` all along — swap to `strategy { ... }`.
+- Install features through the factory's `FunctionalAIAgent.FeatureContext`.
+- Confirm each selected feature accepts that context; compile its installation.
+- Expect no graph node or edge events from this agent shape.
+- For tools, register a `ToolRegistry` and implement a bounded loop using
+  `getToolCalls`, `executeTools` and `sendToolResults`.
+- Use a graph strategy when node-specific checkpoints or graph transitions are required.
 
 Proceed immediately to Step 4.
 
-## Step 4 — Hand Off
+## Step 4 — Verify the Agent
 
-Functional agents are the cheapest entry point — they avoid the DSL learning curve and read like normal Kotlin. Use them for:
-
-- Glue agents (one LLM call wrapped with input/output processing)
-- Demo skeletons before promoting to a real graph
-- Tests of features that don't need graph behavior
-
-When the body starts to grow conditional branches, retries, or tool loops, promote to `GraphAIAgent` with a `strategy { ... }`. Don't try to push functional further than it goes — the topology you'd hand-roll inside a single suspending block becomes the graph DSL by another name, and you lose the inspectability the DSL gives.
+Run `./gradlew build`. Exercise `rewrite` with a mock executor returning a known
+text response; verify the trimmed rewrite and agent cleanup. Exercise any tool
+loop's termination bound and registered tools separately. If compilation or a
+behavior check fails, correct the factory, imports or strategy and repeat the checks.
 
 Finish here.

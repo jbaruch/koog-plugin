@@ -1,21 +1,21 @@
 {
-  "context": "Tests whether the agent installs the SQL feature with read-only mode + schema scoping + row cap — the safety-first configuration — and pins the schema in the system prompt so the LLM doesn't hallucinate table/column names.",
+  "context": "Tests typed prepared JDBC tools with database-enforced read-only access to the named tables, bounded results and explicit schema. agents-features-sql is checkpoint storage, not a query feature.",
   "type": "weighted_checklist",
   "checklist": [
     {
-      "name": "Installs the Sql feature in read-only mode",
+      "name": "Registers read-only prepared JDBC tools",
       "max_score": 25,
-      "description": "Calls install(Sql) { ... } with readOnly = true. Does NOT install in read-write mode (the developer explicitly wants read-only) and does NOT roll a custom SQL tool without the safety controls the feature provides"
+      "description": "Registers typed @Tool / ToolSet lookups using prepared statements and an actual read-only database principal. Does not invent install(Sql), schemaScope or an automatically registered SQL query feature. Does not pass unrestricted model-generated SQL to a statement."
     },
     {
-      "name": "Scopes the schema to the named tables",
+      "name": "Scopes queries to the named tables",
       "max_score": 25,
-      "description": "Sets schemaScope (or equivalent) to the developer's two named tables — public.events and public.users. Does not leave schemaScope unset (which would expose the full database) or include unrelated tables"
+      "description": "Fixed SQL references only public.events and public.users using verified schema names. Does not expose unrelated tables, dynamic table names or unrestricted arbitrary-query access."
     },
     {
       "name": "Caps result rows",
       "max_score": 15,
-      "description": "Sets a maxRows cap (e.g., 100, 500, 1000 — any reasonable hard cap). Without this, an unbounded SELECT can return enormous results that blow context and query cost"
+      "description": "Applies a hard bounded result limit in executable JDBC/query code, not only a prompt instruction, and sets a query timeout. A row cap alone does not bound scan cost."
     },
     {
       "name": "Reads DB credentials from environment",
@@ -23,14 +23,14 @@
       "description": "Reads ANALYTICS_DB_URL, ANALYTICS_DB_USER, ANALYTICS_DB_PASSWORD from System.getenv. Does not inline literals"
     },
     {
-      "name": "Pins schema in system prompt",
+      "name": "Pins the actual schema and tool contract",
       "max_score": 15,
-      "description": "Either includes the schema explicitly in systemPrompt OR enables a describe_schema discovery tool. Without one of these, the LLM hallucinates column names and queries fail"
+      "description": "Includes the inspected table/column names and lookup semantics in the system prompt or an approved discovery tool. Does not invent a built-in describe_schema feature."
     },
     {
-      "name": "Adds the agents-features-sql dependency and JDBC driver",
+      "name": "Adds a JDBC driver",
       "max_score": 5,
-      "description": "Adds ai.koog:agents-features-sql at 1.0.0+ AND a Postgres JDBC driver. Koog does not bundle drivers"
+      "description": "Adds the PostgreSQL JDBC driver with the existing Koog umbrella. Does not add agents-features-sql for query access; that module provides checkpoint storage."
     }
   ]
 }

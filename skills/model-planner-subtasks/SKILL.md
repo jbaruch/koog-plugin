@@ -1,7 +1,7 @@
 ---
 name: model-planner-subtasks
 description: >
-  Model a problem domain as a tree of typed subtasks the Koog 1.2 planner can execute —
+  Model a problem domain as a tree of typed subtasks the Koog 1.3 planner can execute —
   the `PlannerNode` data model, parallel vs sequential composition, accessing
   in-flight subtasks through `AIAgentStorage`, retry-on-parse-failure edges, and
   TL;DR compression between phases. Goes deeper than `use-planner` (which only picks
@@ -54,7 +54,7 @@ Proceed immediately to Step 3.
 Use `AIAgentStorage` to track in-flight planner subtasks across nodes. The pattern from the in-repo example:
 
 ```kotlin
-import ai.koog.agents.core.agent.context.createStorageKey
+import ai.koog.agents.core.agent.entity.createStorageKey
 
 val unfinishedNodesKey = createStorageKey<MutableList<PlannerNode.Builder.Reference>>("unfinishedNodes")
 val currentNodeKey = createStorageKey<PlannerNode.Builder.Reference>("currentNode")

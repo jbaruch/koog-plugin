@@ -2,7 +2,7 @@
 
 ## Problem/Feature Description
 
-A Koog 1.2 service summarises a support ticket on every inbound HTTP request. It
+A Koog 1.3 service summarises a support ticket on every inbound HTTP request. It
 currently calls Anthropic through a `PromptExecutor` with an API key, and the team is
 watching the API bill go up.
 

@@ -3,19 +3,19 @@
   "type": "weighted_checklist",
   "checklist": [
     {
-      "name": "Installs the JDBC chat-history feature",
+      "name": "Installs ChatMemory with a PostgreSQL JDBC provider",
       "max_score": 30,
-      "description": "Calls install(JdbcChatHistory) (or equivalent chat-history-jdbc API) inside the AIAgent(...) trailing lambda. Does NOT install Persistence (wrong layer — that's crash recovery, not conversation resume) and does NOT install LongTermMemory (wrong layer — that's fact retrieval, not message replay)"
+      "description": "Calls install(ChatMemory) and assigns chatHistoryProvider = PostgresJdbcChatHistoryProvider(dataSource), or an equivalent verified JDBC provider. Includes provider schema migration before serving requests. Does NOT install nonexistent JdbcChatHistory, Persistence (crash recovery), or LongTermMemory (fact retrieval)."
     },
     {
       "name": "Adds the JDBC chat-history dependency",
       "max_score": 20,
-      "description": "Adds ai.koog:agents-features-chat-history-jdbc at 1.0.0+. Does not add chat-history-aws (developer named Postgres) and does not add agents-features-persistence-jdbc (wrong feature for this need)"
+      "description": "Adds ai.koog:agents-features-chat-history-jdbc:1.3.0 and a PostgreSQL JDBC driver. Does not add chat-history-aws or agents-features-persistence-jdbc for this PostgreSQL conversation-resume request."
     },
     {
       "name": "Reads DB credentials from environment",
       "max_score": 15,
-      "description": "Reads DB_URL, DB_USER, DB_PASSWORD from System.getenv — none of the values are inlined. Also includes a Postgres JDBC driver in the dependencies (Koog does not bundle drivers)"
+      "description": "Reads DB_URL, DB_USER, DB_PASSWORD from System.getenv \u2014 none of the values are inlined. Also includes a Postgres JDBC driver in the dependencies (Koog does not bundle drivers)"
     },
     {
       "name": "Threads userId as sessionId on agent.run",
@@ -25,7 +25,7 @@
     {
       "name": "Does not require user to thread message history manually",
       "max_score": 10,
-      "description": "Does not require the application code to load prior messages and prepend them to the prompt — the feature handles that. The route/handler just calls agent.run(input, sessionId = userId)"
+      "description": "Does not require the application code to load prior messages and prepend them to the prompt \u2014 the feature handles that. The route/handler just calls agent.run(input, sessionId = userId)"
     }
   ]
 }

@@ -1,7 +1,7 @@
 ---
 name: add-observability
 description: >
-  Install OpenTelemetry observability into a Koog 1.2 agent — the multiplatform
+  Install OpenTelemetry observability into a Koog 1.3 agent — the multiplatform
   feature, the GenAI span/metric vocabulary, and one of the built-in backend
   integrations (Langfuse, Weave, Datadog, raw OTLP). Use when the user asks to
   "add telemetry", "wire up observability", "send traces to Langfuse", "add OpenTelemetry",
@@ -15,7 +15,7 @@ Process steps in order. Do not skip ahead.
 ## Step 1 — Add the Dependency
 
 ```kotlin
-implementation("ai.koog:agents-features-opentelemetry:1.2.0")
+implementation("ai.koog:agents-features-opentelemetry:1.3.0")
 ```
 
 The umbrella `koog-agents` does not include observability — add it explicitly.
@@ -46,22 +46,28 @@ Install inside the `AIAgent(...)` trailing lambda. The feature is multiplatform 
 
 **Langfuse:**
 
+<!-- compile-example: Telemetry -->
 ```kotlin
-import ai.koog.agents.features.opentelemetry.OpenTelemetry
+import ai.koog.agents.core.agent.AIAgent
+import ai.koog.agents.features.opentelemetry.feature.OpenTelemetry
+import ai.koog.agents.features.opentelemetry.attribute.CustomAttribute
 import ai.koog.agents.features.opentelemetry.integration.langfuse.addLangfuseExporter
+import ai.koog.prompt.executor.clients.openai.OpenAIModels
+import ai.koog.prompt.executor.model.PromptExecutor
 
-val agent = AIAgent(
-    promptExecutor = ...,
-    llmModel = ...,
-    systemPrompt = "...",
+fun telemetryAgent(executor: PromptExecutor) = AIAgent(
+    promptExecutor = executor,
+    llmModel = OpenAIModels.Chat.GPT4o,
+    systemPrompt = "You are a helpful assistant.",
 ) {
     install(OpenTelemetry) {
-        setVerbose(true)  // emit prompts, completions, and token counts on each span
+        setVerbose(true)  // include available prompt, completion, and response metadata
         addLangfuseExporter(
             traceAttributes = listOf(
                 CustomAttribute("langfuse.session.id", System.getenv("LANGFUSE_SESSION_ID") ?: ""),
             )
         )
+        setShutdownOnAgentClose(true)
     }
 }
 ```
@@ -84,20 +90,29 @@ Proceed immediately to Step 4.
 
 ## Step 4 — JVM-Only Tuning (Optional)
 
-JVM-only configuration lives on `OpenTelemetryConfigJvm` extensions (`addSpanExporter`, `addMetricExporter`, `addMetricFilter`). These are NOT visible in common code; if your project is JVM-only the extensions resolve normally:
+JVM-specific exporter overloads are members of
+`ai.koog.agents.features.opentelemetry.feature.OpenTelemetryConfig`.
+There is no `OpenTelemetryConfigJvm` class and no extension import for its members.
 
+<!-- compile-example: TelemetryConfig -->
 ```kotlin
-import ai.koog.agents.features.opentelemetry.OpenTelemetryConfigJvm.addSpanExporter
+import ai.koog.agents.features.opentelemetry.feature.OpenTelemetryConfig
+import io.opentelemetry.sdk.trace.export.SpanExporter
 
-install(OpenTelemetry) {
-    addLangfuseExporter(...)
-    // additional JVM-only span exporter
-    addSpanExporter(MyCustomExporter())
-    setShutdownOnAgentClose(true)  // opt-in JVM shutdown flush — the auto-hook was removed in 1.0
+fun configureExporter(config: OpenTelemetryConfig, exporter: SpanExporter) {
+    config.addSpanExporter(exporter)
+    config.setShutdownOnAgentClose(true)
 }
 ```
 
-The JVM shutdown hook is no longer installed automatically — opt in with `setShutdownOnAgentClose(true)` if you want traces flushed when the JVM exits.
+`setShutdownOnAgentClose(true)` shuts down telemetry when the owning agent closes.
+It does not register a JVM exit hook. Close the agent explicitly; coordinate
+telemetry ownership when several agents share a configuration.
+
+Koog 1.3 carries Google's `cachedContentTokenCount` into response metadata and
+OpenTelemetry, and fixes signature-only Gemini reasoning parts in Langfuse traces.
+CLI processes may not report complete token/cost metadata. Instrument application
+actions separately when the required signal is outside Koog's agent events.
 
 Proceed immediately to Step 5.
 

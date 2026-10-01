@@ -2,7 +2,7 @@
 
 ## Problem/Feature Description
 
-A developer has a working Koog 1.0 agent that classifies GitHub issues — currently it returns a free-form string and downstream code parses it with regex (brittle). They want the agent to return a typed object directly:
+A developer has a working Koog 1.3 agent that classifies GitHub issues — currently it returns a free-form string and downstream code parses it with regex (brittle). They want the agent to return a typed object directly:
 
 ```kotlin
 @Serializable

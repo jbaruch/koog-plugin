@@ -2,9 +2,10 @@
 
 [![tessl](https://img.shields.io/endpoint?url=https%3A%2F%2Fapi.tessl.io%2Fv1%2Fbadges%2Fjbaruch%2Fkoog)](https://tessl.io/registry/jbaruch/koog)
 
-Koog 1.2 idioms, gotchas, and skills for Kotlin agents on the JVM.
+Koog 1.3 idioms, gotchas, and skills for Kotlin agents on the JVM.
 
-Koog reached 1.2.0 on 2026-08-28. The published documentation at `docs.koog.ai` lags the source in several places (stale Maven coordinates, MCP pages 404, no mention of the planner module split or HTTP transport decoupling). This agentic context plugin codifies what the 1.2 source actually shows.
+This plugin targets Koog 1.3.0, released 2026-09-24. Resolve API and module-coordinate
+questions against the tagged source and each artifact's Maven metadata.
 
 ## Install
 
@@ -20,7 +21,7 @@ Two **always-on rules** carry the gotchas every Koog project hits — module coo
 
 | Rule | Concept |
 |---|---|
-| `module-coordinates` | Two version lines — umbrella `ai.koog:koog-agents:1.2.0`, a wide satellite set only at `1.2.0-beta`; bare coordinates for Gradle, `-jvm` suffix for Maven only; pull planner / MCP / Spring / Ktor / Google modules explicitly; JDK 17 + Kotlin 2.3.10 minimum |
+| `module-coordinates` | Two version lines — umbrella `ai.koog:koog-agents:1.3.0`, a wide satellite set only at `1.3.0-beta`; bare coordinates for Gradle, `-jvm` suffix for Maven only; pull planner / MCP / Spring / Ktor / Google modules explicitly; JDK 17 + Kotlin 2.3.10 minimum |
 | `agent-construction` | Top-level `AIAgent(...)` factory; `installFeatures` trailing lambda; `singleRunStrategy()` default; `AgentMemory` removed |
 
 ## Skills
@@ -28,7 +29,7 @@ Two **always-on rules** carry the gotchas every Koog project hits — module coo
 ### Foundations
 | Skill | What it does |
 |---|---|
-| `scaffold-agent` | Bootstrap a new Koog 1.2 Kotlin project from scratch |
+| `scaffold-agent` | Bootstrap a new Koog 1.3 Kotlin project from scratch |
 | `add-tool` | Add a tool — annotated `@Tool` / typed `Tool<TArgs,TResult>` / sub-agent-as-tool |
 | `define-prompt` | Author prompts beyond `systemPrompt = "..."` — DSL, few-shot, augmenters |
 | `use-functional-agent` | Use `FunctionalAIAgent` — single suspending block, no graph, no planner |
@@ -49,7 +50,7 @@ Two **always-on rules** carry the gotchas every Koog project hits — module coo
 | `manage-state` | `AIAgentStorage`, history compression, `LongTermMemory` (replaces removed `AgentMemory`) |
 | `add-persistence` | Continuous checkpointing + `runFromCheckpoint` for crash resilience |
 | `snapshot-and-restore` | Caller-triggered save points for explicit fork/replay |
-| `persist-chat-history` | Chat-history backends (JDBC, AWS, SQL-typed) — resume conversations by session |
+| `persist-chat-history` | `ChatMemory` with JDBC, AgentCore, or SQL-backed providers — resume conversations by session |
 
 ### Integrations
 | Skill | What it does |
@@ -60,7 +61,7 @@ Two **always-on rules** carry the gotchas every Koog project hits — module coo
 | `wire-a2a` | Agent-to-Agent protocol — serve or consume |
 | `wire-acp-server` | Agent Client Protocol — fine-grained client control with cancellation |
 | `use-cli-agents` | Drive Claude Code / Codex via `CliAIAgent` on subscription auth, composed with `.asNode()` |
-| `query-sql-from-agent` | SQL-querying feature with read-only mode, schema scoping, row caps |
+| `query-sql-from-agent` | Typed JDBC lookup tools with prepared queries, database grants, row caps and timeouts |
 
 ### Quality and cost
 | Skill | What it does |
@@ -87,8 +88,15 @@ Two **always-on rules** carry the gotchas every Koog project hits — module coo
 
 ## Scope
 
-This plugin teaches **Kotlin** consumption of Koog 1.2 **on the JVM**. Java-interop surface (`AIAgentService`, `*Blocking` variants from #2005) is deferred to a future `jbaruch/koog-java`. Other Kotlin targets (Kotlin/JS, Kotlin/Native, Compose Multiplatform) are not covered — the rules and skills assume `kotlin("jvm")`, JDK 17, and JVM-only features (JVM shutdown hooks for OpenTelemetry, JDBC for persistence backends).
+This plugin teaches **Kotlin** consumption of Koog 1.3 **on the JVM**. Java-interop surface (`AIAgentService`, `*Blocking` variants from #2005) is deferred to a future `jbaruch/koog-java`. Other Kotlin targets (Kotlin/JS, Kotlin/Native, Compose Multiplatform) are not covered — the rules and skills assume `kotlin("jvm")`, JDK 17, and JVM-specific exporter/metrics configuration and JDBC backends. OpenTelemetry shutdown follows agent close.
 
 ## Source of authority
 
-Where this plugin and `docs.koog.ai` disagree, this plugin follows the [Koog 1.2.0 source](https://github.com/JetBrains/koog/tree/1.2.0) and the [v1.2.0 release notes](https://github.com/JetBrains/koog/releases/tag/1.2.0).
+Where this plugin and `docs.koog.ai` disagree, this plugin follows the [Koog 1.3.0 source](https://github.com/JetBrains/koog/tree/1.3.0) and the [v1.3.0 release notes](https://github.com/JetBrains/koog/releases/tag/1.3.0).
+
+## Verification
+
+With JDK 21 and Gradle 9.2.1, run `gradle -p tests/examples check`.
+The check compiles marked examples directly from the published skills against
+Koog 1.3.0 / 1.3.0-beta and runs deterministic behavioral regressions.
+See [tests/examples/README.md](tests/examples/README.md) for coverage and dependency renewal.

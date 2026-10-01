@@ -10,7 +10,7 @@
     {
       "name": "Adds the separate planner module dependency",
       "max_score": 20,
-      "description": "Adds ai.koog:agents-planner to build.gradle.kts at 1.0.0 or later — the planner lives in its own module since 1.0, the umbrella does not include it"
+      "description": "Adds ai.koog:agents-planner to build.gradle.kts at 1.3.0-beta — the planner lives in its own module since 1.0, the umbrella does not include it"
     },
     {
       "name": "Passes the planner as the strategy parameter",

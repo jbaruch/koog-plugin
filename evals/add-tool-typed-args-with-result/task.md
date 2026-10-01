@@ -2,7 +2,7 @@
 
 ## Problem/Feature Description
 
-A developer has a Koog 1.0 agent that helps customer-support staff look up account information. They want the agent to call into their existing account-lookup logic — a `suspend fun queryAccount(req: AccountLookupRequest): AccountLookupResult` that lives in their project today and is also consumed by other (non-agent) code paths.
+A developer has a Koog 1.3 agent that helps customer-support staff look up account information. They want the agent to call into their existing account-lookup logic — a `suspend fun queryAccount(req: AccountLookupRequest): AccountLookupResult` that lives in their project today and is also consumed by other (non-agent) code paths.
 
 The function's signature is fixed by those other consumers:
 

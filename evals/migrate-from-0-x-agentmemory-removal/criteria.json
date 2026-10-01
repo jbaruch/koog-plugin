@@ -10,7 +10,7 @@
     {
       "name": "Renames queryExtractor and extractionStrategy",
       "max_score": 15,
-      "description": "Renames queryExtractor → searchQueryProvider and extractionStrategy → documentExtractor inside the install block. The corresponding type references update accordingly"
+      "description": "Configures searchQueryProvider inside retrieval {} and documentExtractor inside ingestion {} on ai.koog.agents.longtermmemory.feature.LongTermMemory. Supplies explicit search/write storage to each enabled block; uses FailurePolicy.FAIL_FAST or LOG_AND_CONTINUE when setting policies. Does not emit a flat configuration or nonexistent enum values."
     },
     {
       "name": "Removes IngestionTiming",
@@ -25,17 +25,17 @@
     {
       "name": "Adds the new LongTermMemory dependency",
       "max_score": 15,
-      "description": "Adds ai.koog:agents-features-longterm-memory at 1.0.0+ to the build (and the AWS backend module if using Bedrock). The umbrella koog-agents does not include this feature"
+      "description": "Adds ai.koog:agents-features-longterm-memory at 1.3.0-beta to the build (and the AWS backend module if using Bedrock). The umbrella koog-agents does not include this feature"
     },
     {
       "name": "Bumps JDK target to 17",
       "max_score": 10,
-      "description": "Updates the JVM toolchain to 17 — Koog 1.0 requires JDK 17 minimum. The current JDK 11 target compiles against 0.x but fails against 1.0"
+      "description": "Updates the JVM toolchain to 17 — Koog 1.3 requires JDK 17 minimum. The current JDK 11 target compiles against 0.x but fails against 1.0"
     },
     {
       "name": "Updates all Koog coordinates to 1.0+",
       "max_score": 10,
-      "description": "Bumps every ai.koog:* artifact in build.gradle.kts to 1.0.0 or later. Does not leave any artifact at the 0.7.x version"
+      "description": "Bumps every ai.koog:* artifact in build.gradle.kts to the selected Koog 1.3 stable/beta version. Does not leave any artifact at the 0.7.x version"
     }
   ]
 }
