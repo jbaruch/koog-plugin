@@ -1,1 +1,3 @@
-{ "description": "Caller-triggered snapshot with runFromSnapshot fork" }
+{
+  "description": "Explicit checkpoint save point with two independent continuation branches"
+}

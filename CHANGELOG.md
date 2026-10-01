@@ -2,6 +2,30 @@
 
 All notable changes to this plugin are documented here. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [0.6.1] — 2026-10-01
+
+### Fixed
+
+- Fresh eval review exposed checkpoint examples omitted from the 0.6.0 compiler
+  fixtures. Persistence now uses `ai.koog.agents.snapshot.feature`, a concrete
+  provider and `Persistence.runFromCheckpoint(agent, input, checkpoint)`.
+  Automatic restart uses the same durable provider, graph and stable session ID.
+- Manual save points use Persistence with automatic saving disabled and
+  `createCheckpointAfterNode`. The separate Snapshot feature, `snapshot()` and
+  `runFromSnapshot()` previously documented do not exist in Koog 1.3.
+  Forks explicitly vary the restored continuation output, not the ordinary input.
+- Checkpoint payload fields, no-op defaults, serialization failures and completed-run
+  tombstones are documented. The three checkpoint eval rubrics no longer reward
+  nonexistent APIs or reject a valid automatic restart path. The fork task no
+  longer supplies the nonexistent method names to both arms.
+- Linked this repository to its Tessl project so future evals retain the same history.
+
+### Validation
+
+Four additional published fences compile. Three deterministic tests verify durable
+restart and tombstones, feature-free replay, and independent forks without repeating
+saved prefix work. The 17 behavior tests use no live models or external services.
+
 ## [0.6.0] — 2026-10-01
 
 Targets Koog **1.3.0** / **1.3.0-beta**. Repairs the invalid examples and behavioral

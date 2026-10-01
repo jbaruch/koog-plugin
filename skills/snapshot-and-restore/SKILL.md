@@ -1,84 +1,131 @@
 ---
 name: snapshot-and-restore
 description: >
-  Snapshot a running Koog 1.3 agent's state at arbitrary points and restore later —
-  distinct from the persistence checkpoint loop in `add-persistence`. Snapshots are
-  caller-triggered; persistence is automatic and continuous. Use when the user asks
-  to "snapshot the agent", "save state at this point", "restore from a snapshot",
-  or names the `agents-features-snapshot` module.
+  Save an explicit Koog 1.3 checkpoint and replay or fork from it. Use when the user
+  asks to snapshot at a chosen decision point, compare branches from saved state,
+  or build replay tooling. Uses Persistence with automatic checkpointing disabled.
 ---
 
 # Snapshot and Restore Skill
 
 Process steps in order. Do not skip ahead.
 
-## Step 1 — Confirm Snapshot Is the Right Tool
+## Step 1 — Choose Manual or Automatic Checkpoints
 
-Persistence (`add-persistence`) writes checkpoints automatically on a configured schedule (every node, every N steps, every successful turn). Snapshot is **caller-triggered** — you call `snapshot()` when *you* decide it's a useful save point.
+Koog 1.3 uses `Persistence` from `ai.koog.agents.snapshot.feature` for both modes.
+There is no separate `Snapshot` feature, `snapshot()` or `runFromSnapshot()` API.
 
-Use snapshot when:
+For automatic crash recovery without explicit save calls, invoke
+`Skill(skill: "add-persistence")`, deliver its durable backend and stable-session
+run path, and explain that automatic checkpointing is the requested mode. Finish here.
+For chosen save points and forks, proceed immediately to Step 2.
 
-- The interesting save points are semantic ("after the user approves the plan"), not periodic
-- You want to fork — take a snapshot, try variant A, restore, try variant B
-- You're building a debugger or replay tool that needs explicit save/load semantics
+## Step 2 — Implement the Fork
 
-If the user's need is "agent should resume after a crash", snapshot is the wrong feature. It is caller-triggered, not automatic. Invoke `Skill(skill: "add-persistence")` and deliver its `install(Persistence)` solution. Add one reply sentence telling the developer snapshot is caller-triggered and the Persistence feature checkpoints automatically. The redirect alone is not the deliverable. Finish here. Do not continue to Step 2. If the need is "save state at this specific point", continue.
+Add `ai.koog:agents-features-snapshot:1.3.0` to `build.gradle.kts`. Write the following
+to `src/main/kotlin/com/example/CheckpointFork.kt`, adapting the named prefix and
+continuation nodes to the developer's existing graph.
 
-Proceed immediately to Step 2.
-
-## Step 2 — Add the Dependency
-
+<!-- compile-example: CheckpointFork -->
 ```kotlin
-implementation("ai.koog:agents-features-snapshot:1.3.0")
-```
+import ai.koog.agents.core.agent.AIAgent
+import ai.koog.agents.core.agent.execution.path
+import ai.koog.agents.core.dsl.builder.node
+import ai.koog.agents.core.dsl.builder.strategy
+import ai.koog.agents.snapshot.feature.AgentCheckpointData
+import ai.koog.agents.snapshot.feature.Persistence
+import ai.koog.agents.snapshot.feature.withPersistence
+import ai.koog.agents.snapshot.providers.InMemoryPersistenceStorageProvider
+import ai.koog.prompt.executor.clients.openai.OpenAIModels
+import ai.koog.prompt.executor.model.PromptExecutor
+import ai.koog.serialization.JSONPrimitive
+import ai.koog.serialization.typeToken
 
-Proceed immediately to Step 3.
-
-## Step 3 — Install the Feature
-
-```kotlin
-import ai.koog.agents.features.snapshot.Snapshot
-
-val agent = AIAgent(
-    promptExecutor = ...,
-    llmModel = ...,
-    systemPrompt = "...",
-) {
-    install(Snapshot) {
-        // optional: storage backend (in-memory, disk, JDBC)
+fun checkpointForkAgent(
+    executor: PromptExecutor,
+    onPrefix: () -> Unit,
+    onCheckpoint: (AgentCheckpointData) -> Unit,
+): AIAgent<String, String> {
+    val graph =
+        strategy<String, String>("checkpoint-fork") {
+            val prepare by node<String, String> { input ->
+                onPrefix()
+                input
+            }
+            val branchPoint by node<String, String> { input ->
+                val checkpoint =
+                    withPersistence { context ->
+                        createCheckpointAfterNode(
+                            agentContext = context,
+                            nodePath = context.executionInfo.path(),
+                            lastOutput = input,
+                            lastOutputType = typeToken<String>(),
+                            version = 0L,
+                        )
+                    }
+                onCheckpoint(requireNotNull(checkpoint) { "Checkpoint serialization failed" })
+                input
+            }
+            val continueBranch by node<String, String> { input -> "result:$input" }
+            edge(nodeStart forwardTo prepare)
+            edge(prepare forwardTo branchPoint)
+            edge(branchPoint forwardTo continueBranch)
+            edge(continueBranch forwardTo nodeFinish)
+        }
+    return AIAgent(
+        promptExecutor = executor,
+        llmModel = OpenAIModels.Chat.GPT4o,
+        strategy = graph,
+    ) {
+        install(Persistence) {
+            storage = InMemoryPersistenceStorageProvider()
+            enableAutomaticPersistence = false
+        }
     }
+}
+
+suspend fun compareCheckpointBranches(
+    agent: AIAgent<String, String>,
+    checkpoint: AgentCheckpointData,
+): Pair<String, String> {
+    val graphState = requireNotNull(checkpoint.graphProperties)
+    suspend fun branch(variant: String): String =
+        Persistence.runFromCheckpoint(
+            agent = agent,
+            input = "",
+            checkpoint =
+                AgentCheckpointData(
+                    checkpointId = checkpoint.checkpointId,
+                    createdAt = checkpoint.createdAt,
+                    messageHistory = checkpoint.messageHistory,
+                    llmParams = checkpoint.llmParams,
+                    version = checkpoint.version,
+                    graphProperties = graphState.copy(lastOutput = JSONPrimitive(variant)),
+                    properties = checkpoint.properties,
+                    llmModel = checkpoint.llmModel,
+                    tools = checkpoint.tools,
+                    storage = checkpoint.storage,
+                    agentIterations = checkpoint.agentIterations,
+                ),
+            sessionId = "fork-$variant",
+        )
+    return branch("A") to branch("B")
 }
 ```
 
-Proceed immediately to Step 4.
+Run the initial prefix once and retain the `AgentCheckpointData` supplied to
+`onCheckpoint`. Pass it to `compareCheckpointBranches`. Replay resumes after the
+saved node. The two copies replace its serialized output for the continuation;
+changing the ordinary `input` argument alone does not change the restored output.
+Use distinct session IDs for independent branches and stable matching graph/node
+names. Forks preserve the saved prefix history and typed storage.
 
-## Step 4 — Call the Snapshot API from Code
-
-Inside a node body (or from outside the run via the agent's API), call `snapshot()`:
-
-```kotlin
-// inside a node body
-val snapshotId = snapshot()        // returns an identifier you store
-storeSnapshotId(snapshotId)
-```
-
-Restore by passing the snapshot ID to `runFromSnapshot`:
-
-```kotlin
-val snapshotId = loadSnapshotId()
-val result = agent.runFromSnapshot(snapshotId, additionalInput = null)
-```
-
-Snapshots are the typed-storage half of persistence — `AIAgentStorage` rides along automatically (values must be `@Serializable`, see `manage-state`). Non-serializable types break snapshots silently, same as checkpoints.
-
-Forking — take a snapshot, run one branch, restore, run another:
-
-```kotlin
-val branchPoint = snapshot()
-val resultA = agent.runFromSnapshot(branchPoint, additionalInput = "variant A input")
-val resultB = agent.runFromSnapshot(branchPoint, additionalInput = "variant B input")
-```
-
-Useful for A/B testing strategy variants without re-running the prefix.
+In-memory storage is suitable for same-process comparison. For later process
+restarts, replace it with a durable provider and retrieve the saved checkpoint by
+session and checkpoint ID. Increment checkpoint versions for repeated saves in a
+session. Node outputs and typed storage must serialize successfully; custom data
+classes require a supported serializer. Invoke `Skill(skill: "manage-state")` for
+typed storage. Replay does not undo external side effects; isolate branch effects
+or make them idempotent.
 
 Finish here.

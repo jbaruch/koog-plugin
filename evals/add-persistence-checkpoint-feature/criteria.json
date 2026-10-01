@@ -1,36 +1,36 @@
 {
-  "context": "Tests whether the agent installs the write-side persistence feature (the right tool for continuous checkpointing) rather than only using runFromCheckpoint (which is the read-only resume path and would not help survive restarts on its own).",
+  "context": "Tests durable automatic execution checkpoints in Koog 1.3, including a concrete JDBC provider, schema migration and a stable session identifier for crash recovery.",
   "type": "weighted_checklist",
   "checklist": [
     {
       "name": "Installs the Persistence feature",
       "max_score": 30,
-      "description": "Calls install(Persistence) { ... } inside the AIAgent(...) trailing lambda — the write-side feature that produces checkpoints continuously. Does NOT only use runFromCheckpoint on its own — that's the read path and produces no new checkpoints"
+      "description": "Installs ai.koog.agents.snapshot.feature.Persistence in the AIAgent trailing lambda with automatic persistence enabled. Explicit replay alone does not write new checkpoints."
     },
     {
       "name": "Adds the JDBC persistence backend dependency",
       "max_score": 25,
-      "description": "Adds ai.koog:agents-features-persistence-jdbc to build.gradle.kts at 1.3.0 with each artifact on its stable or beta line — the developer named JDBC explicitly. Does not add an in-memory backend (would not survive restarts) or a different backend than asked"
+      "description": "Adds ai.koog:agents-features-persistence-jdbc to build.gradle.kts at 1.3.0 with each artifact on its stable or beta line \u2014 the developer named JDBC explicitly. Does not add an in-memory backend (would not survive restarts) or a different backend than asked"
     },
     {
       "name": "Configures the backend with the JDBC connection",
       "max_score": 20,
-      "description": "Inside the install block, configures the JDBC backend with the connection URL (and credentials read from env vars, not hardcoded). The configuration is concrete, not a TODO placeholder"
+      "description": "Assigns a concrete JDBC PersistenceStorageProvider to storage, configures a datasource using environment credentials, and migrates the checkpoint schema. An empty install block or TODO is insufficient."
     },
     {
-      "name": "Uses Persistence type names, not Persistency",
+      "name": "Uses current checkpoint packages and types",
       "max_score": 10,
-      "description": "Imports and references types with the 1.0 spelling Persistence* — the pre-1.0 Persistency* spelling was renamed. Uses Persistence-, not Persistency-, anywhere in the snippet"
+      "description": "Uses ai.koog.agents.snapshot.feature.Persistence and JDBC provider types from ai.koog.agents.features.persistence.jdbc. Does not import a nonexistent ai.koog.agents.features.persistence.Persistence or core.persistence.AgentCheckpointData."
     },
     {
-      "name": "Shows resume path with runFromCheckpoint",
+      "name": "Demonstrates a valid restart path",
       "max_score": 10,
-      "description": "Demonstrates how the resume side works — after a restart, loads the latest checkpoint and calls agent.runFromCheckpoint(...) instead of agent.run(...). Without showing this, the durability story is incomplete"
+      "description": "Recreates the agent against the same durable provider and calls run with the same stable sessionId so Persistence restores the latest non-tombstone checkpoint automatically; alternatively explicitly loads a checkpoint and calls Persistence.runFromCheckpoint(agent, input, checkpoint). agent.runFromCheckpoint(checkpoint) is nonexistent and does not satisfy this criterion."
     },
     {
       "name": "Notes serializability requirement for storage",
       "max_score": 5,
-      "description": "Calls out (in code comment or surrounding prose) that any AIAgentStorage values must be @Serializable — non-serializable types break checkpointing silently"
+      "description": "Notes that saved node outputs and storage values must serialize with the configured serializer. Custom data classes need a supported serializer such as Kotlinx @Serializable; unsupported outputs can cause checkpoints to be skipped."
     }
   ]
 }

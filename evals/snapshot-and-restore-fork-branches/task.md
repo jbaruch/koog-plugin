@@ -8,4 +8,4 @@ They named the desired behavior: "save the agent's state at this point, then run
 
 ## Output Specification
 
-Walk through what to install and how to fork. Produce the relevant code snippet — the install, the snapshot call inside a node body, and the two `runFromSnapshot` calls — as a single response, labeled.
+Implement the save point and the two independent continuations in the project files. Preserve the saved prefix while giving each branch its own follow-up input.

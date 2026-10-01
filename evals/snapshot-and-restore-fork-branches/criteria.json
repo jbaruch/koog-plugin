@@ -1,31 +1,31 @@
 {
-  "context": "Tests whether the agent reaches for the Snapshot feature (caller-triggered save points — the right fit for the explicit fork shape the developer described) rather than the Persistence feature (automatic checkpoint loop — wrong shape for explicit fork-and-compare).",
+  "context": "Tests manual checkpoint-and-fork using Koog 1.3 Persistence with automatic saving disabled. The snapshot module supplies Persistence; there is no separate Snapshot feature or runFromSnapshot API.",
   "type": "weighted_checklist",
   "checklist": [
     {
-      "name": "Installs the Snapshot feature",
+      "name": "Configures manual Persistence with a real provider",
       "max_score": 30,
-      "description": "Calls install(Snapshot) { ... } inside the AIAgent(...) trailing lambda. Does NOT install Persistence — that's continuous automatic checkpointing, wrong shape for the explicit save-and-fork use case the developer described"
+      "description": "Installs ai.koog.agents.snapshot.feature.Persistence with a concrete in-memory or durable storage provider and enableAutomaticPersistence=false for explicit save points. Does not invent install(Snapshot)."
     },
     {
       "name": "Adds the agents-features-snapshot dependency",
       "max_score": 15,
-      "description": "Adds ai.koog:agents-features-snapshot at 1.3.0 with each artifact on its stable or beta line to build.gradle.kts. Does not add agents-features-persistence-* (wrong feature)"
+      "description": "Adds ai.koog:agents-features-snapshot:1.3.0 to build.gradle.kts; a durable backend dependency that brings this module transitively is also valid."
     },
     {
-      "name": "Calls snapshot() at the decision point",
+      "name": "Creates a checkpoint at the decision point",
       "max_score": 20,
-      "description": "Calls snapshot() inside the node body at the developer's chosen decision point, capturing the snapshot ID for later use. The call is explicit, not at every node"
+      "description": "Uses withPersistence and createCheckpointAfterNode at the named graph decision point, passing the context, its executionInfo.path(), serialized output type and version; retains the returned AgentCheckpointData. Does not invent snapshot()."
     },
     {
-      "name": "Demonstrates two runFromSnapshot calls",
+      "name": "Replays two independent checkpoint branches",
       "max_score": 25,
-      "description": "Shows two distinct runFromSnapshot calls from the same snapshot ID with different additional inputs — the fork. Does not show a single resume call (which would not demonstrate the fork)"
+      "description": "Calls Persistence.runFromCheckpoint twice from the same saved prefix with distinct sessions and explicit per-branch continuation values, for example copies of graphProperties.lastOutput. Changing only the input argument does not replace restored lastOutput. Does not invent agent.runFromSnapshot or additionalInput parameters."
     },
     {
       "name": "Notes serializability requirement",
       "max_score": 10,
-      "description": "Calls out (in code comment or surrounding prose) that snapshot values are serialized — any AIAgentStorage entries must be @Serializable or snapshotting breaks silently"
+      "description": "Explains that node outputs and typed storage must serialize successfully and custom data classes need a supported serializer. Uses matching graph/node names and notes that replay does not undo external side effects."
     }
   ]
 }

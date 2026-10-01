@@ -8,4 +8,4 @@ They want the agent to write durable checkpoints continuously, so a restart can 
 
 ## Output Specification
 
-Walk through what to add. Produce the modified agent construction and dependency change as a single response, labeled.
+Implement the checkpoint configuration and restart path in the Kotlin project files, including the dependency changes. Document how the same work item resumes after a process restart.
