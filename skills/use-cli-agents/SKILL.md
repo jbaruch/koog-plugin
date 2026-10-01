@@ -4,7 +4,8 @@ description: >
   Drive another vendor's CLI coding agent (Claude Code, OpenAI Codex, or an
   arbitrary binary) from inside a Koog agent using `CliAIAgent`, and compose it
   into a graph strategy with `.asNode()`. Authenticates through whatever
-  subscription that CLI is already logged into, so no API key is needed. Use
+  login that CLI is already using; subscription auth requires an environment
+  without API billing credentials. Use
   when the user asks to "call Claude Code from Koog", "use my Claude/Codex
   subscription instead of an API key", "orchestrate multiple coding agents",
   "use a different vendor for one step", or names `CliAIAgent` / `agents-cli`.
@@ -59,7 +60,7 @@ import ai.koog.agents.cli.claude.ClaudePermissionMode
 val reviewer = CliAIAgent.claude(
     transport = CliTransport.default(),
     outputClass = Critique::class,        // @Serializable — gives typed output
-    apiKey = null,                        // null = use the CLI's own auth. This is the point.
+    apiKey = null,                        // add no API key; inherited credentials still apply
     permissionMode = ClaudePermissionMode.BypassPermissions,
     workspace = scratchDir,               // see Step 3
     systemPrompt = "...",
@@ -69,9 +70,9 @@ val reviewer = CliAIAgent.claude(
 
 Four things that will each cost you a build:
 
-- **`apiKey = null` is deliberate.** Passing a key sets `ANTHROPIC_API_KEY` /
-  `CODEX_API_KEY` in the child environment and *overrides* the subscription. Leave it
-  null to use the login
+- **`apiKey = null` adds no key.** The default process transport inherits the parent
+  environment and adds the supplied environment entries. Null does not remove
+  inherited `ANTHROPIC_API_KEY`, `CODEX_API_KEY`, or `OPENAI_API_KEY`
 - **`generateRequest` must be a named argument.** As a trailing lambda it binds to
   `installFeatures` instead, and the error is a confusing arity mismatch on
   `FeatureContext`
@@ -82,6 +83,15 @@ Four things that will each cost you a build:
 Constructors: `CliAIAgent.claude(...)`, `CliAIAgent.codex(...)`, and
 `CliAIAgent.builder(transport)` for any other binary — the custom builder needs
 `binaryPath`, `flags`, `generateRequest` and `extractOutput`.
+
+For subscription-only use, launch Koog from a sanitized environment or supply a
+transport that removes API billing credentials before starting the CLI. Verify
+the CLI's active authentication mode without printing credentials.
+
+Native `subgraphWithTask` / `subgraphWithVerification` helpers use Koog's configured
+prompt executor. `CliAIAgent` runs an external coding-agent process. Its request
+contains only `generateRequest` output and explicit CLI/system configuration;
+graph message history is not automatically forwarded.
 
 Proceed immediately to Step 3.
 

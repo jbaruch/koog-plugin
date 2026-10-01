@@ -1,4 +1,4 @@
-# Bump a 0.x Codebase Using AgentMemory to 1.0
+# Bump a 0.x Codebase Using AgentMemory to 1.3
 
 ## Problem/Feature Description
 
@@ -18,8 +18,8 @@ val agent = AIAgent.invoke(
 }
 ```
 
-They want to bump to Koog 1.0. They're targeting JDK 11 today.
+They want to bump to Koog 1.3. They're targeting JDK 11 today.
 
 ## Output Specification
 
-Walk through all the changes required to bring this snippet to 1.0. Produce the changed Kotlin code and the dependency/toolchain changes as a single response, labeled.
+Walk through all the changes required to bring this snippet to 1.3. Produce the changed Kotlin code and the dependency/toolchain changes as a single response, labeled.

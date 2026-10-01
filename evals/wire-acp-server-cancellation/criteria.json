@@ -10,7 +10,7 @@
     {
       "name": "Adds the agents-features-acp dependency",
       "max_score": 15,
-      "description": "Adds ai.koog:agents-features-acp to build.gradle.kts at 1.0.0 or later"
+      "description": "Adds ai.koog:agents-features-acp to build.gradle.kts at 1.3.0-beta"
     },
     {
       "name": "Makes the long-running tool honor cancellation",

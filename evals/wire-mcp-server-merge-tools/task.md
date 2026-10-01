@@ -2,7 +2,7 @@
 
 ## Problem/Feature Description
 
-A developer has a Koog 1.0 agent that already has its own tools registered — they wrote a `CalculatorTools` ToolSet class and they register it as:
+A developer has a Koog 1.3 agent that already has its own tools registered — they wrote a `CalculatorTools` ToolSet class and they register it as:
 
 ```kotlin
 val agent = AIAgent(

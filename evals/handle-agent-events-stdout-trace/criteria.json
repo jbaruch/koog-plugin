@@ -10,7 +10,7 @@
     {
       "name": "Adds the agents-features-event-handler dependency",
       "max_score": 20,
-      "description": "Adds ai.koog:agents-features-event-handler to build.gradle.kts at 1.0.0 or later. The umbrella does not include the event handler"
+      "description": "Adds ai.koog:agents-features-event-handler to build.gradle.kts at 1.3.0 with each artifact on its stable or beta line. The umbrella does not include the event handler"
     },
     {
       "name": "Subscribes to onToolCallStarting",

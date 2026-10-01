@@ -5,12 +5,12 @@
     {
       "name": "Uses CliAIAgent.claude with outputClass",
       "max_score": 25,
-      "description": "Constructs the reviewer via CliAIAgent.claude(..., outputClass = Critique::class, ...) to get a typed CliAgentStructuredResponse<Critique>. Does NOT add an Anthropic PromptExecutor or AnthropicLLMClient — the task states no API key exists, so any API-key-based solution fails the requirement outright"
+      "description": "Constructs the reviewer via CliAIAgent.claude(..., outputClass = Critique::class, ...) to get a typed CliAgentStructuredResponse<Critique>. Does NOT add an Anthropic PromptExecutor or AnthropicLLMClient \u2014 the task states no API key exists, so any API-key-based solution fails the requirement outright"
     },
     {
-      "name": "apiKey is null, and says why",
+      "name": "Uses existing CLI login without inherited API billing credentials",
       "max_score": 20,
-      "description": "Leaves apiKey null (or omits it) and identifies that this is what makes the CLI use its own subscription login. Passing a key sets ANTHROPIC_API_KEY in the child environment and overrides the subscription — the opposite of what was asked"
+      "description": "Leaves apiKey null or omits it and explains that this adds no key, rather than forcing subscription auth. The default process transport inherits the parent environment. Requires a sanitized parent environment or a transport that removes ANTHROPIC_API_KEY, CODEX_API_KEY and OPENAI_API_KEY before starting the child, plus verification of the CLI authentication mode without printing credentials. Does not claim null clears inherited credentials."
     },
     {
       "name": "Fails closed on a null critique",
@@ -20,7 +20,7 @@
     {
       "name": "Composes with asNode and imports it",
       "max_score": 15,
-      "description": "Wires the agent into the strategy with .asNode(), including the ai.koog.agents.cli.asNode import — asNode is an extension function and the code does not compile without it"
+      "description": "Wires the agent into the strategy with .asNode(), including the ai.koog.agents.cli.asNode import \u2014 asNode is an extension function and the code does not compile without it"
     },
     {
       "name": "agents-cli on the beta version line",

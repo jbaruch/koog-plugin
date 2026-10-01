@@ -2,7 +2,7 @@
 
 ## Problem/Feature Description
 
-A developer wants to test a Koog 1.0 agent that classifies support tickets. The agent has a `lookup_priority` tool that consults an internal API. The test should:
+A developer wants to test a Koog 1.3 agent that classifies support tickets. The agent has a `lookup_priority` tool that consults an internal API. The test should:
 
 1. Verify that for a "server is down" input, the agent calls `lookup_priority` first, then replies with a classification
 2. Not hit any real LLM or real internal API

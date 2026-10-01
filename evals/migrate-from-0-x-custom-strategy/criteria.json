@@ -1,5 +1,5 @@
 {
-  "context": "Tests whether the migration catches the non-obvious 1.0 breaking changes that hit a custom-strategy agent with a hand-built client — the nodeExecuteTools auto-writeback removal in the graph DSL, the LLMClient HTTP-transport decoupling, and the KoogClock swap — not just the surface-level coordinate and JDK bumps. A baseline with no Koog 1.0 knowledge keeps the 0.x topology and constructor shapes, which silently break or fail to compile.",
+  "context": "Tests whether the migration catches the non-obvious 1.0 breaking changes that hit a custom-strategy agent with a hand-built client — the nodeExecuteTools auto-writeback removal in the graph DSL, the LLMClient HTTP-transport decoupling, and the KoogClock swap — not just the surface-level coordinate and JDK bumps. A baseline with no Koog 1.3 knowledge keeps the 0.x topology and constructor shapes, which silently break or fail to compile.",
   "type": "weighted_checklist",
   "checklist": [
     {
@@ -30,7 +30,7 @@
     {
       "name": "Bumps all Koog coordinates to 1.0 with no mixed versions",
       "max_score": 10,
-      "description": "Updates ai.koog:koog-agents (and any other ai.koog artifact) to 1.0.0 or later, leaving nothing at 0.7.x. Failure: leaves a 0.x artifact in place, producing an unsupported mixed 0.x/1.0 graph"
+      "description": "Updates ai.koog:koog-agents (and any other ai.koog artifact) to 1.3.0 with each artifact on its stable or beta line, leaving nothing at 0.7.x. Failure: leaves a 0.x artifact in place, producing an unsupported mixed 0.x/1.0 graph"
     }
   ]
 }

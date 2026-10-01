@@ -4,15 +4,14 @@ alwaysApply: true
 
 # Module Coordinates
 
-## Use 1.2, not 1.0, and never 0.x
+## Use the Koog 1.3 baseline
 
 - All Koog artifacts ship under group `ai.koog`. The current umbrella is
-  **`ai.koog:koog-agents:1.3.0`** (released 2026-08-28)
+  **`ai.koog:koog-agents:1.3.0`** (released 2026-09-24)
 - Never mix 0.x with 1.x — the API surface diverged at 1.0 (factory functions,
   planner module split, HTTP transport decoupling) and a mixed graph fails at link time
-- 1.0 → 1.2 is **source-compatible** for the graph DSL: `subgraphWithTask`,
-  `subgraphWithVerification`, `CriticResult`, `ToolSet`, MCP and memory all survive
-  unchanged. The only removal is `PromptAugmenter.SECTION_SEPARATOR`, in a beta module
+- Check tagged upstream APIs when migrating examples
+- Match each artifact's version line
 - The hosted Maven snippet on `docs.koog.ai/quickstart/` lags the release. Don't copy
   it — check `repo1.maven.org/maven2/ai/koog/koog-agents/maven-metadata.xml`
 
@@ -77,8 +76,8 @@ Do not add `-jvm` to a Gradle coordinate.
 
 ## Package locations that are not where you would guess
 
-Verified by compiling against 1.3.0. Each of these produces an `Unresolved reference`
-that looks like a missing dependency but is a wrong import.
+Use the package locations from the tagged Koog 1.3 source. Check imports when a
+resolved dependency still produces an `Unresolved reference`.
 
 | Symbol | Actual package | Notes |
 |---|---|---|

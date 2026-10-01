@@ -8,7 +8,7 @@ A developer is building a research-assistant agent. For each question, it should
 2. Run each angle as a parallel subtask, each ending with a structured summary
 3. Sequentially compose all summaries into a final answer
 
-They want the workflow expressed in a Koog 1.0 planner agent. They specifically want the angles to run in parallel (not serially), and they want to know which subtask is currently executing while a run is in flight, for debugging.
+They want the workflow expressed in a Koog 1.3 planner agent. They specifically want the angles to run in parallel (not serially), and they want to know which subtask is currently executing while a run is in flight, for debugging.
 
 ## Output Specification
 

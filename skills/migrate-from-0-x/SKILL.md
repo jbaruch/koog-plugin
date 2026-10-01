@@ -109,11 +109,11 @@ Proceed immediately to Step 9.
 
 If the code installs `OpenTelemetry`:
 
-- JVM-only knobs (`addSpanExporter`, `addMetricExporter`, `addMetricFilter`) moved to `OpenTelemetryConfigJvm` — update imports
+- JVM-specific exporter overloads live on `ai.koog.agents.features.opentelemetry.feature.OpenTelemetryConfig`; use its current members
 - `addResourceAttributes` signature changed to `Map<String, Any>`
 - `SpanEndStatus` → `StatusData`
 - The `ai.koog.agents.features.opentelemetry.event` package and event APIs on `GenAIAgentSpan` (`events`, `addEvent`, `addEvents`, `removeEvent`) were **removed**. Replace with span attributes (`gen_ai.input.messages` / `gen_ai.output.messages`)
-- JVM shutdown hook no longer installed automatically — opt in via `setShutdownOnAgentClose(true)`
+- `setShutdownOnAgentClose(true)` shuts down telemetry on agent close; close the owning agent explicitly
 
 Proceed immediately to Step 10.
 

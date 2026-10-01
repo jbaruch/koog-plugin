@@ -29,9 +29,11 @@ Proceed immediately to Step 2.
 
 Match what the user has available without blocking on a clarifying question:
 
-- **JDBC** (`chat-history-jdbc`) — any JDBC-compatible database (Postgres, MySQL, etc.). Default when the user names Postgres / MySQL / a JDBC URL / env vars like `DB_URL`
-- **AWS** (`chat-history-aws`) — DynamoDB or AWS-hosted alternatives. Pick when the user names DynamoDB / AWS / S3
-- **SQL-typed chat memory** (`chat-memory-sql`) — SQL backend with stronger typing over chat messages. Pick when the user explicitly asks for typed chat memory
+- **JDBC** (`chat-history-jdbc`) — concrete providers such as `PostgresJdbcChatHistoryProvider` and `MySQLJdbcChatHistoryProvider`. Default when the user names Postgres / MySQL / a JDBC URL
+- **AWS** (`chat-history-aws`) — `AgentcoreChatHistoryProvider` for Bedrock AgentCore short-term memory
+- **SQL-backed chat history** (`chat-memory-sql`) — Exposed-backed providers such as `PostgresChatHistoryProvider`
+
+These modules supply providers for `ChatMemory`; they are not installable features.
 
 Proceed immediately to Step 3.
 
@@ -61,24 +63,38 @@ Create files if they don't exist. Do not respond with prose only.
 
 Install in the `AIAgent(...)` trailing lambda. JDBC example:
 
+<!-- compile-example: ChatHistory -->
 ```kotlin
-import ai.koog.agents.features.chathistory.jdbc.JdbcChatHistory
+import ai.koog.agents.chatMemory.feature.ChatMemory
+import ai.koog.agents.core.agent.AIAgent
+import ai.koog.agents.features.chathistory.jdbc.PostgresJdbcChatHistoryProvider
+import ai.koog.prompt.executor.clients.openai.OpenAIModels
+import ai.koog.prompt.executor.model.PromptExecutor
+import org.postgresql.ds.PGSimpleDataSource
 
-val agent = AIAgent(
-    promptExecutor = ...,
-    llmModel = ...,
-    systemPrompt = "...",
-) {
-    install(JdbcChatHistory) {
-        jdbcUrl = System.getenv("DB_URL")
-        username = System.getenv("DB_USER")
-        password = System.getenv("DB_PASSWORD")
-        // table name + schema — defaults are sensible, override if you must
+suspend fun chatAgent(executor: PromptExecutor): AIAgent<String, String> {
+    val dataSource = PGSimpleDataSource().apply {
+        setURL(requireNotNull(System.getenv("DB_URL")) { "Set DB_URL" })
+        user = requireNotNull(System.getenv("DB_USER")) { "Set DB_USER" }
+        password = requireNotNull(System.getenv("DB_PASSWORD")) { "Set DB_PASSWORD" }
+    }
+    val historyProvider = PostgresJdbcChatHistoryProvider(dataSource)
+    historyProvider.migrate()
+    return AIAgent(
+        promptExecutor = executor,
+        llmModel = OpenAIModels.Chat.GPT4o,
+        systemPrompt = "Help the user resume their conversation.",
+    ) {
+        install(ChatMemory) {
+            chatHistoryProvider = historyProvider
+            windowSize(50)
+        }
     }
 }
 ```
 
-Always read credentials from environment variables, never inline the values.
+Include the PostgreSQL JDBC driver for `PGSimpleDataSource`. Migrate the provider's
+schema before serving requests. Read credentials from environment variables.
 
 Proceed immediately to Step 5.
 
@@ -103,7 +119,9 @@ agent.run("Following up on the bug from yesterday", sessionId = resumedSessionId
 
 Don't store the session ID inside the agent or in `AIAgentStorage` — that storage is run-scoped. The session ID is the user's identity in the chat history backend; persist it in your application's user/session layer.
 
-Multi-turn within one process: the same agent instance can call `agent.run(input, sessionId = ...)` repeatedly. The installed chat-history backend (`JdbcChatHistory` / `ChatHistoryAws` / `ChatMemorySql`) accumulates the message log on each call, so a `while (true) { agent.run(submissions.receive(), sessionId = userId) }` loop maintains context across user turns without reconstructing the agent.
+Multi-turn within one process: the same agent instance can call `agent.run(input,
+sessionId = ...)` repeatedly. `ChatMemory` loads and stores history through its
+configured provider. Keep the session ID in the application's user/session layer.
 
 Proceed immediately to Step 6.
 

@@ -2,6 +2,62 @@
 
 All notable changes to this plugin are documented here. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [0.6.0] — 2026-10-01
+
+Targets Koog **1.3.0** / **1.3.0-beta**. Repairs the invalid examples and behavioral
+guidance tracked in #31, including defects already present on the 1.2 baseline.
+
+### Fixed
+
+- Storage key imports now use `agent.entity`. Long-term memory uses the
+  `longtermmemory.feature` package, explicit retrieval/ingestion storage, and
+  `FAIL_FAST` / `LOG_AND_CONTINUE` failure policies.
+- Conversation persistence installs `ChatMemory` with a concrete history provider,
+  including PostgreSQL datasource credentials and schema migration. JDBC, AgentCore
+  and SQL-backed implementations are providers, not separate installable features.
+- OpenTelemetry imports and JVM exporter configuration use the current feature
+  package and `OpenTelemetryConfig` members. Shutdown on agent close is distinct
+  from JVM exit; CLI token/cost metadata and application-action tracing remain
+  separate concerns.
+- Google scaffolding uses `GoogleModels.Gemini2_5FlashLite` and both required beta
+  artifacts. Koog 1.3's Gemini profiles and Google/Langfuse metadata fixes are documented.
+- Graph history is shared by default, with `freshHistory = true` available for
+  task isolation. External CLI processes receive explicit requests rather than
+  automatically inheriting graph messages.
+- Skill discovery is a snapshot at `discoverSkills` invocation. Restart or explicit
+  rediscovery and catalog regeneration loads new capabilities. Read-only filesystem
+  access is not root confinement; a constrained tool example rejects traversal and
+  symlink escapes on a stable filesystem.
+- `apiKey = null` adds no key and does not clear inherited billing variables.
+  Subscription-only use requires a sanitized environment and verified CLI auth.
+- Eval rubrics use current stable/beta coordinates and bare Gradle MCP artifacts.
+  Chat-memory, discovery and CLI rubrics no longer reward the repaired defects.
+- Skill review exposed a nonexistent `ai.koog.prompt.processor` augmenter API.
+  Prompt examples now wire `AIAgentConfig.prompt` and graph write sessions directly;
+  memory retrieval augmenters are documented at their actual package/configuration.
+- `agents-features-sql` was misidentified as a query feature. It supplies checkpoint
+  providers; database lookups now use explicit prepared JDBC tools with database
+  grants, bounded results and query timeouts. The SQL eval rubric matches that API.
+
+- Functional agents now use the top-level `AIAgent` factory, `functionalStrategy`
+  and `requestLLM` instead of nonexistent factory/request methods. A mock executor
+  verifies the published request and text transformation.
+
+### Added
+
+- CI compiles thirteen marked code examples directly from the published skill fences.
+  Deterministic regressions cover storage checkpoint round trips, graph history,
+  discovery refresh, filesystem permission boundaries and synthetic CLI credentials.
+  No live model, database, telemetry service or vendor CLI is used.
+- Locked fixture dependencies and weekly Gradle dependency renewal. Tests and build
+  artifacts are excluded from the registry package.
+
+### Validation
+
+All 38 distinct versioned Koog coordinates in the rules/skills resolve on Maven
+Central. No new paired model-eval scores are claimed for this release; historical
+scores used earlier rubrics and do not establish compilation correctness.
+
 ## [0.5.1] — 2026-09-07
 
 Documentation only. No skill, rule, manifest or eval-scenario content differs from 0.5.0.

@@ -10,7 +10,7 @@
     {
       "name": "Adds the JDBC persistence backend dependency",
       "max_score": 25,
-      "description": "Adds ai.koog:agents-features-persistence-jdbc to build.gradle.kts at 1.0.0 or later — the developer named JDBC explicitly. Does not add an in-memory backend (would not survive restarts) or a different backend than asked"
+      "description": "Adds ai.koog:agents-features-persistence-jdbc to build.gradle.kts at 1.3.0 with each artifact on its stable or beta line — the developer named JDBC explicitly. Does not add an in-memory backend (would not survive restarts) or a different backend than asked"
     },
     {
       "name": "Configures the backend with the JDBC connection",

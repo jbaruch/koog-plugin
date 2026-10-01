@@ -65,7 +65,9 @@ application {
 }
 ```
 
-If the user picked a provider that requires a non-umbrella client artifact, add that dependency explicitly (e.g., `implementation("ai.koog:prompt-executor-litert-client:1.3.0-beta")`).
+For Google, add both `ai.koog:prompt-executor-google-client:1.3.0-beta` and
+`ai.koog:prompt-executor-llms-all:1.3.0-beta`. Add other non-umbrella client
+artifacts explicitly when the selected provider requires them.
 
 Write `settings.gradle.kts` with `rootProject.name = "<directory-name>"` and a single `include(":")` is not needed for a flat project — leave it as just `rootProject.name = ...`.
 
@@ -75,6 +77,7 @@ Proceed immediately to Step 4.
 
 Path: `src/main/kotlin/com/example/Main.kt`. Use the canonical 1.0 form — top-level `AIAgent(...)` factory, env-var API key, `singleRunStrategy()` is the default so no explicit `strategy=` parameter:
 
+<!-- compile-example: Scaffold -->
 ```kotlin
 package com.example
 
@@ -98,7 +101,27 @@ fun main() = runBlocking {
 }
 ```
 
-For Anthropic, swap `simpleOpenAIExecutor` → `simpleAnthropicExecutor`, `OpenAIModels.Chat.GPT4o` → `AnthropicModels.Opus_4_7`, and the env var name. For Google: `simpleGoogleAIExecutor` + `GoogleModels.Chat.Gemini_2_5_FlashLite`. For Ollama: `simpleOllamaAIExecutor(baseUrl = "http://localhost:11434")` and an `OllamaModels.*` entry; no API key needed.
+For Anthropic, use `simpleAnthropicExecutor`, `AnthropicModels.Opus_5`, and
+`ANTHROPIC_API_KEY`. For Ollama, use `simpleOllamaAIExecutor(baseUrl =
+"http://localhost:11434")` and an `OllamaModels.*` entry; no API key is required.
+
+For Google, use the following construction with the dependencies from Step 3.
+Koog 1.3 also provides `GoogleModels.Gemini3_6Flash` and `GoogleModels.Gemini3_7Flash`.
+
+<!-- compile-example: GoogleScaffold -->
+```kotlin
+import ai.koog.agents.core.agent.AIAgent
+import ai.koog.prompt.executor.clients.google.GoogleModels
+import ai.koog.prompt.executor.llms.all.simpleGoogleAIExecutor
+
+fun googleAgent() = AIAgent(
+    promptExecutor = simpleGoogleAIExecutor(
+        requireNotNull(System.getenv("GOOGLE_API_KEY")) { "Set GOOGLE_API_KEY" },
+    ),
+    llmModel = GoogleModels.Gemini2_5FlashLite,
+    systemPrompt = "You are a helpful assistant.",
+)
+```
 
 Do NOT add `strategy = singleRunStrategy()` to the constructor — it's the default and listing it muddies the example. Add an explicit `strategy = ...` only when the user is overriding the default.
 

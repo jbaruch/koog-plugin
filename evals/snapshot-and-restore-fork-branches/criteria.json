@@ -10,7 +10,7 @@
     {
       "name": "Adds the agents-features-snapshot dependency",
       "max_score": 15,
-      "description": "Adds ai.koog:agents-features-snapshot at 1.0.0+ to build.gradle.kts. Does not add agents-features-persistence-* (wrong feature)"
+      "description": "Adds ai.koog:agents-features-snapshot at 1.3.0 with each artifact on its stable or beta line to build.gradle.kts. Does not add agents-features-persistence-* (wrong feature)"
     },
     {
       "name": "Calls snapshot() at the decision point",

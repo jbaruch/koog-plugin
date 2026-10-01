@@ -26,7 +26,8 @@ If the user is on Anthropic, proceed to Step 2.
 
 ## Step 2 — Automatic Caching (Already On)
 
-Koog 1.3 turned on automatic Anthropic prompt caching by default. Long system prompts and repeated tool definitions are cached without code changes.
+Automatic Anthropic prompt caching is enabled by default. Long system prompts and
+repeated tool definitions are cached without code changes.
 
 To verify it's working, check the token-usage span attributes after a few runs:
 

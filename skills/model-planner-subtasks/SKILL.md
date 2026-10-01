@@ -54,7 +54,7 @@ Proceed immediately to Step 3.
 Use `AIAgentStorage` to track in-flight planner subtasks across nodes. The pattern from the in-repo example:
 
 ```kotlin
-import ai.koog.agents.core.agent.context.createStorageKey
+import ai.koog.agents.core.agent.entity.createStorageKey
 
 val unfinishedNodesKey = createStorageKey<MutableList<PlannerNode.Builder.Reference>>("unfinishedNodes")
 val currentNodeKey = createStorageKey<PlannerNode.Builder.Reference>("currentNode")

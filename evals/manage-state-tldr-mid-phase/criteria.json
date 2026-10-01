@@ -1,5 +1,5 @@
 {
-  "context": "Tests whether the agent picks the right Koog 1.0 API for history compression (a writeSession-locked replaceHistoryWithTLDR call at a deliberate boundary) rather than reaching for an external string-manipulation approach or compressing on every node.",
+  "context": "Tests whether the agent picks the right Koog 1.3 API for history compression (a writeSession-locked replaceHistoryWithTLDR call at a deliberate boundary) rather than reaching for an external string-manipulation approach or compressing on every node.",
   "type": "weighted_checklist",
   "checklist": [
     {

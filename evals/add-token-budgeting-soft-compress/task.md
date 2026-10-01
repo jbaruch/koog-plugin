@@ -2,7 +2,7 @@
 
 ## Problem/Feature Description
 
-A developer runs a Koog 1.0 agent that processes user-submitted tasks. They've had incidents where a single complex task consumed tens of thousands of tokens and produced a large bill. They want to cap each run at 50,000 tokens.
+A developer runs a Koog 1.3 agent that processes user-submitted tasks. They've had incidents where a single complex task consumed tens of thousands of tokens and produced a large bill. They want to cap each run at 50,000 tokens.
 
 They explicitly say: "Don't just abort when the cap is hit — try to continue by summarizing the history first, and only fail if summarization can't reclaim enough budget." The agent runs against OpenAI's GPT-4o.
 

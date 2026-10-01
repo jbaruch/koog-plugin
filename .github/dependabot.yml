@@ -5,6 +5,12 @@
 # check for the bump.
 version: 2
 updates:
+  - package-ecosystem: "gradle"
+    directory: "/tests/examples"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore(test)"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:

@@ -1,11 +1,11 @@
 {
-  "context": "Tests whether the skill produces a Koog 1.0-correct scaffold for an OpenAI-backed agent: current artifact coordinates, top-level factory, JDK 17 toolchain, env-var-driven key, and absence of redundant defaults.",
+  "context": "Tests whether the skill produces a Koog 1.3-correct scaffold for an OpenAI-backed agent: current artifact coordinates, top-level factory, JDK 17 toolchain, env-var-driven key, and absence of redundant defaults.",
   "type": "weighted_checklist",
   "checklist": [
     {
       "name": "Uses 1.0+ umbrella coordinate",
       "max_score": 20,
-      "description": "build.gradle.kts declares an `ai.koog:koog-agents` dependency at version 1.0.0 or later. Not 0.7.x, not a partial set of submodules when the umbrella covers them"
+      "description": "build.gradle.kts declares an `ai.koog:koog-agents` dependency at version the selected Koog 1.3 stable/beta version. Not 0.7.x, not a partial set of submodules when the umbrella covers them"
     },
     {
       "name": "Targets JDK 17 toolchain",

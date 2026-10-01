@@ -1,5 +1,5 @@
 {
-  "context": "Tests whether the agent reaches for subgraphs with task and verification — the canonical Koog 1.0 pattern for the generate/verify/fix shape — rather than building a single god-node with branching or hand-rolling a verify loop with raw nodeLLMRequest nodes.",
+  "context": "Tests whether the agent reaches for subgraphs with task and verification — the canonical Koog 1.3 pattern for the generate/verify/fix shape — rather than building a single god-node with branching or hand-rolling a verify loop with raw nodeLLMRequest nodes.",
   "type": "weighted_checklist",
   "checklist": [
     {

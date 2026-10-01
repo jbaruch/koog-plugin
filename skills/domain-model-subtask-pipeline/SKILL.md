@@ -143,22 +143,27 @@ Communication-only adjustment cannot apply the corrected fix.
 
 Proceed immediately to Step 6.
 
-## Step 6 — Trust the Auto-Shared Message History
+## Step 6 — Choose Message History Scope
 
-Koog shares the message history across subtasks automatically, even when each
-subtask uses a different model. You do NOT thread the history manually between
-subgraphs. Tool calls from `identifyProblem` are visible to `fixProblem`'s
-LLM; `fixProblem`'s actions are visible to `verifySolution`.
+Koog shares message history across graph subtasks by default, including subtasks
+using different models. With the default scope, tool calls from `identifyProblem`
+are visible to `fixProblem`, and its actions are visible to `verifySolution`.
 
 Subgraphs are different from independent agents:
 
-- A Koog subgraph (`subgraphWithTask` / `subgraphWithVerification`) is part of one agent. All subgraphs read the same shared message history
+- A Koog subgraph is part of one agent. `subgraphWithTask(..., freshHistory = true)` resets conversation history and preserves system messages; its default is `false`
 - A Koog sub-agent (`AIAgentService.fromAgent`, covered by `Skill(skill: "add-tool")` Step 3) is a separate agent. The parent and child communicate only through the typed input/output of the tool call
 - LangChain4j Agentic sub-agents follow the same independent-agent model — input/output handoffs, no shared history
 - The typed handoffs in Step 3 carry the structured artifact each phase produces. The shared history carries the surrounding context for free
 
-If you actually want isolation (a phase that should NOT see prior context),
-use a sub-agent (`Skill(skill: "add-tool")` Step 3), not a subgraph.
+Use `freshHistory = true` for a graph task that should not see prior conversation turns.
+System instructions and context placed in system messages remain visible.
+Pass its required context through the typed input and task prompt. Use a separate
+sub-agent when the phase needs an independent agent lifecycle or configuration.
+
+An external `CliAIAgent` receives the input rendered by `generateRequest` and its
+explicit system prompt. It does not inherit Koog's graph history. Pass any context
+the CLI step needs in that request; see `Skill(skill: "use-cli-agents")`.
 
 If the chain is long, history grows. Compress at deliberate boundaries (end of
 a phase, start of the next), not at every node:

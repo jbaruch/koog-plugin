@@ -20,7 +20,7 @@
     {
       "name": "Adds the tokenizer dependencies",
       "max_score": 15,
-      "description": "Adds both ai.koog:agents-features-tokenizer and ai.koog:prompt-tokenizer at 1.0.0+. Without prompt-tokenizer, the feature has no per-model tokenizer to use"
+      "description": "Adds both ai.koog:agents-features-tokenizer and ai.koog:prompt-tokenizer at the selected Koog 1.3 stable/beta version. Without prompt-tokenizer, the feature has no per-model tokenizer to use"
     },
     {
       "name": "Does not lower the model to a cheaper one",
