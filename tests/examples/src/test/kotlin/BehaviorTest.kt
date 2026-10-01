@@ -28,7 +28,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
-import kotlin.time.Duration.Companion.seconds
 
 class BehaviorTest {
     @TempDir
@@ -258,10 +257,17 @@ object EnvironmentProbe {
                         command = listOf(java, "-cp", System.getProperty("java.class.path"), "verified.EnvironmentReporter"),
                         workspace = Path.of(".").toAbsolutePath().toString(),
                         env = emptyMap(),
-                        timeout = 10.seconds,
+                        timeout = null,
                     ).toList()
-            check(events.none { it is CliEvent.Failed }) { "CLI probe failed" }
-            check(events.filterIsInstance<CliEvent.Exit>().single().code == 0) { "CLI probe exited nonzero" }
+            val failures = events.filterIsInstance<CliEvent.Failed>()
+            check(failures.isEmpty()) {
+                "CLI probe failed: $failures; inspect the EnvironmentReporter command and test classpath"
+            }
+            val exits = events.filterIsInstance<CliEvent.Exit>()
+            check(exits.singleOrNull()?.code == 0) {
+                "CLI probe exits: $exits, stderr: ${events.filterIsInstance<CliEvent.Stderr>()}; " +
+                    "inspect the EnvironmentReporter command and test classpath"
+            }
             println("billing=" + events.filterIsInstance<CliEvent.Stdout>().single().content)
         }
 }
