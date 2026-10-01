@@ -1,5 +1,5 @@
 {
-  "name": "koog-plugin",
+  "name": "jbaruch/koog-plugin",
   "mode": "vendored",
   "dependencies": {
     "jbaruch/coding-policy": {
