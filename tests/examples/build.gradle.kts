@@ -26,7 +26,7 @@ dependencies {
     testImplementation("com.h2database:h2:2.4.240")
     testImplementation(kotlin("test-junit5"))
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.2")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.8.2")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:6.1.3")
 }
 
 dependencyLocking {
