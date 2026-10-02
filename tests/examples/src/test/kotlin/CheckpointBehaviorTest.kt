@@ -82,7 +82,7 @@ class CheckpointBehaviorTest {
         }
 
     @Test
-    fun explicitGraphReplayRejectsPlannerStateBeforeTheUpstreamCast() =
+    fun explicitGraphReplayRejectsPlannerStateBeforeTheUpstreamCast(): Unit =
         runBlocking {
             val checkpoint =
                 AgentCheckpointData(
