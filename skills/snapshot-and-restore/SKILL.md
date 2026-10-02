@@ -1,84 +1,46 @@
 ---
 name: snapshot-and-restore
 description: >
-  Snapshot a running Koog 1.3 agent's state at arbitrary points and restore later —
-  distinct from the persistence checkpoint loop in `add-persistence`. Snapshots are
-  caller-triggered; persistence is automatic and continuous. Use when the user asks
-  to "snapshot the agent", "save state at this point", "restore from a snapshot",
-  or names the `agents-features-snapshot` module.
+  Save an explicit Koog 1.3 checkpoint and replay or fork from it. Use when the user
+  asks to snapshot at a chosen decision point, compare branches from saved state,
+  or build replay tooling. Uses Persistence with automatic checkpointing disabled.
 ---
 
 # Snapshot and Restore Skill
 
 Process steps in order. Do not skip ahead.
 
-## Step 1 — Confirm Snapshot Is the Right Tool
+## Step 1 — Choose Manual or Automatic Checkpoints
 
-Persistence (`add-persistence`) writes checkpoints automatically on a configured schedule (every node, every N steps, every successful turn). Snapshot is **caller-triggered** — you call `snapshot()` when *you* decide it's a useful save point.
+Koog 1.3 uses `Persistence` from `ai.koog.agents.snapshot.feature` for both modes.
+There is no separate `Snapshot` feature, `snapshot()` or `runFromSnapshot()` API.
 
-Use snapshot when:
+For automatic crash recovery without explicit save calls, invoke
+`Skill(skill: "add-persistence")`, deliver its durable backend and stable-session
+run path, and explain that automatic checkpointing is the requested mode. Finish here.
+For chosen save points and forks, proceed immediately to Step 2.
 
-- The interesting save points are semantic ("after the user approves the plan"), not periodic
-- You want to fork — take a snapshot, try variant A, restore, try variant B
-- You're building a debugger or replay tool that needs explicit save/load semantics
+## Step 2 — Implement the Fork
 
-If the user's need is "agent should resume after a crash", snapshot is the wrong feature. It is caller-triggered, not automatic. Invoke `Skill(skill: "add-persistence")` and deliver its `install(Persistence)` solution. Add one reply sentence telling the developer snapshot is caller-triggered and the Persistence feature checkpoints automatically. The redirect alone is not the deliverable. Finish here. Do not continue to Step 2. If the need is "save state at this specific point", continue.
+Add `ai.koog:agents-features-snapshot:1.3.0` to `build.gradle.kts`. Read `skills/snapshot-and-restore/references/checkpoint-fork.md` and write its
+factory and comparison helper to `src/main/kotlin/com/example/CheckpointFork.kt`, adapting the named prefix and
+continuation nodes to the developer's existing graph.
 
-Proceed immediately to Step 2.
 
-## Step 2 — Add the Dependency
+Run the initial prefix once and retain the `AgentCheckpointData` supplied to
+`onCheckpoint`. Pass it to `compareCheckpointBranches`. Replay resumes after the
+saved node. The two copies replace its serialized output for the continuation;
+changing the ordinary `input` argument alone does not change the restored output.
+Use distinct session IDs for independent branches and stable matching graph/node
+names. Forks preserve the saved prefix history and typed storage. The capture run finishes
+without executing the continuation; only the two restored branches execute it.
 
-```kotlin
-implementation("ai.koog:agents-features-snapshot:1.3.0")
-```
-
-Proceed immediately to Step 3.
-
-## Step 3 — Install the Feature
-
-```kotlin
-import ai.koog.agents.features.snapshot.Snapshot
-
-val agent = AIAgent(
-    promptExecutor = ...,
-    llmModel = ...,
-    systemPrompt = "...",
-) {
-    install(Snapshot) {
-        // optional: storage backend (in-memory, disk, JDBC)
-    }
-}
-```
-
-Proceed immediately to Step 4.
-
-## Step 4 — Call the Snapshot API from Code
-
-Inside a node body (or from outside the run via the agent's API), call `snapshot()`:
-
-```kotlin
-// inside a node body
-val snapshotId = snapshot()        // returns an identifier you store
-storeSnapshotId(snapshotId)
-```
-
-Restore by passing the snapshot ID to `runFromSnapshot`:
-
-```kotlin
-val snapshotId = loadSnapshotId()
-val result = agent.runFromSnapshot(snapshotId, additionalInput = null)
-```
-
-Snapshots are the typed-storage half of persistence — `AIAgentStorage` rides along automatically (values must be `@Serializable`, see `manage-state`). Non-serializable types break snapshots silently, same as checkpoints.
-
-Forking — take a snapshot, run one branch, restore, run another:
-
-```kotlin
-val branchPoint = snapshot()
-val resultA = agent.runFromSnapshot(branchPoint, additionalInput = "variant A input")
-val resultB = agent.runFromSnapshot(branchPoint, additionalInput = "variant B input")
-```
-
-Useful for A/B testing strategy variants without re-running the prefix.
+In-memory storage is suitable for same-process comparison. For later process
+restarts, replace it with a durable provider and retrieve the saved checkpoint by
+session and checkpoint ID. Increment checkpoint versions for repeated saves in a
+session. Node outputs and typed storage must serialize successfully; custom data
+classes require a supported serializer. Invoke `Skill(skill: "manage-state")` for
+typed storage. Replay does not undo external side effects; isolate branch effects
+or make them idempotent.
 
 Finish here.

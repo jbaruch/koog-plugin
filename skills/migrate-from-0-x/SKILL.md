@@ -121,9 +121,27 @@ Proceed immediately to Step 10.
 
 If the code uses persistence/checkpoints:
 
-- Type spelling: `Persistency*` → `Persistence*`
-- `AIAgentPipeline` / `AIAgentPipelineImpl` → `AIAgentPipelineAPI` + `AIAgentGraphPipeline` / `AIAgentPlannerPipeline`
-- `AgentCheckpointData` shape changed — `nodePath`, `lastInput`, `lastOutput` moved inside `properties: JSONObject`
+- Use current Persistence feature/provider types.
+- Replace the no-op `NoPersistencyStorageProvider` with durable storage for crash recovery.
+- Use `AIAgentGraphPipeline` for graph features.
+- Use `AIAgentPlannerPipeline` for planner features.
+- Use `AIAgentPipelineAPI` for shared pipeline contracts.
+- Import `AgentCheckpointData` from `ai.koog.agents.snapshot.feature`.
+- Use `graphProperties.nodePath` and `graphProperties.lastOutput` for graph checkpoints.
+- Use `plannerProperties` for planner checkpoints.
+- Preserve `checkpointId`, `createdAt`, `version`, message history and serialized storage.
+- Replace the obsolete `properties.lastInput` payload shape.
+- Custom planners must pass matching non-null `stateType` and `planType` tokens to
+  the `AIAgentPlanner` base constructor; built-in `SimpleLLMPlanner` supplies both.
+- Keep planner state, plans and storage values serializable with the configured serializer.
+- For graph replay, replace `agent.runFromCheckpoint(checkpoint)` with
+  `Persistence.runFromCheckpoint(agent, input, checkpoint)`.
+- Recover planner checkpoints through installed Persistence and the same provider/session ID.
+- Use the explicit replay helper for graph checkpoints only.
+- Invoke `Skill(skill: "add-persistence")` for durable providers and automatic restart.
+- Replace nonexistent `Snapshot`, `snapshot()` and `runFromSnapshot()` examples with
+  the Persistence save/replay APIs.
+- Invoke `Skill(skill: "snapshot-and-restore")` for forks.
 - `AIAgentStorageKey` equality is now name-based
 - `AIAgentStorage()` no-arg constructor replaced by `AIAgentStorage(serializer)`
 - `AIAgentStorage.toMap()` removed

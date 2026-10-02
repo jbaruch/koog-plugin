@@ -2,6 +2,42 @@
 
 All notable changes to this plugin are documented here. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [0.6.1] — 2026-10-01
+
+### Fixed
+
+- Fresh eval review exposed checkpoint examples omitted from the 0.6.0 compiler
+  fixtures. Persistence now uses `ai.koog.agents.snapshot.feature`, a concrete
+  provider and `Persistence.runFromCheckpoint(agent, input, checkpoint)`.
+  Automatic restart uses the same durable provider, graph and stable session ID.
+- Manual save points use Persistence with automatic saving disabled and
+  `createCheckpointAfterNode`. The separate Snapshot feature, `snapshot()` and
+  `runFromSnapshot()` previously documented do not exist in Koog 1.3.
+  Forks explicitly vary the restored continuation output, not the ordinary input.
+  Capturing a save point ends before continuation; only the two restored branches
+  run continuation work.
+- Checkpoint payload fields, no-op defaults, serialization failures and completed-run
+  tombstones are documented. The three checkpoint eval rubrics no longer reward
+  nonexistent APIs or reject a valid automatic restart path. The fork task no
+  longer supplies the nonexistent method names to both arms.
+- Migration guidance now uses the current checkpoint payload and replay APIs.
+  PostgreSQL settings include purpose/source documentation and variable-specific
+  error messages; fork validation errors identify the required serializer or graph.
+  Explicit replay rejects planner checkpoints; planner recovery uses the installed
+  feature and stable session. Importing a supplied planner checkpoint uses a fresh
+  session to avoid checkpoint ordering/version collisions. Custom planner state/plan type tokens and serialization
+  requirements are documented and scored. Database settings reject blank values.
+- Long durable-provider and fork examples live in linked references; the compiler
+  fixture continues to extract those published examples.
+- Linked this repository to its Tessl project so future evals retain the same history.
+
+### Validation
+
+Four additional published fences compile. Four deterministic tests verify durable
+restart and tombstones, feature-free graph replay, planner-checkpoint rejection,
+and independent forks without repeating saved prefix work. The 18 behavior tests
+use no live models or external services.
+
 ## [0.6.0] — 2026-10-01
 
 Targets Koog **1.3.0** / **1.3.0-beta**. Repairs the invalid examples and behavioral

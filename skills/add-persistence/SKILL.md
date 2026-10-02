@@ -1,84 +1,117 @@
 ---
 name: add-persistence
 description: >
-  Add checkpoint-and-resume to a Koog 1.3 agent. Two modes — `runFromCheckpoint`
-  for replay-only use without installing a feature, and the full Persistence
-  feature when you need rolling checkpoints, replay-with-modifications, or planner-agent
-  durability across restarts. Use when the user asks to "make the agent resumable",
-  "save progress", "checkpoint the agent", "restart from where it left off", or
-  describes a long-running workflow that may be interrupted.
+  Route Koog 1.3 graph checkpoint replay, automatic durable recovery, conversation
+  history and explicit forks. Use when the user asks to make an agent resumable,
+  restart an interrupted workflow, resume a conversation, or fork from saved state.
 ---
 
 # Add Persistence Skill
 
 This skill is an action router — pick the step that matches the user's intent and execute only that step. Do not run other steps; do not parallelize.
 
-Available actions:
+- **Step 1** — Replay a saved graph checkpoint.
+- **Step 2** — Automatic crash recovery for graph or planner agents.
+- **Step 3** — Conversation history across visits.
+- **Step 4** — Explicit save points and forks.
 
-- **Step 1** — `runFromCheckpoint` only (replay/restore from a saved checkpoint, no feature install)
-- **Step 2** — Persistence feature install (writing checkpoints continuously during a run)
+## Step 1 — Replay a Saved Checkpoint
 
-## Step 1 — `runFromCheckpoint` Only
+Add `ai.koog:agents-features-snapshot:1.3.0`. Write the replay helper to
+`src/main/kotlin/com/example/CheckpointReplay.kt`.
 
-Use when you have a checkpoint payload (typically from a previous run that did install the feature) and you want to resume execution from it — without installing the write-side feature yourself.
-
+<!-- compile-example: CheckpointReplay -->
 ```kotlin
 import ai.koog.agents.core.agent.AIAgent
-import ai.koog.agents.core.persistence.AgentCheckpointData
+import ai.koog.agents.snapshot.feature.AgentCheckpointData
+import ai.koog.agents.snapshot.feature.Persistence
 
-val checkpoint: AgentCheckpointData = loadFromYourStorage(...)
-
-val agent = AIAgent(
-    promptExecutor = ...,
-    llmModel = ...,
-    systemPrompt = "...",
-)
-
-val result = agent.runFromCheckpoint(checkpoint)
-```
-
-`AgentCheckpointData` shape in 1.0:
-
-- `id`, `sessionId`, `schemaVersion` at the top level
-- `properties: JSONObject` contains `nodePath`, `lastInput`, `lastOutput` (moved inside `properties` in 1.0)
-- `storage` is the serialized `AIAgentStorage`
-
-If you constructed checkpoints manually under 0.x, the shape is different — extract the moved fields and rebuild before passing.
-
-Finish here.
-
-## Step 2 — Persistence Feature Install
-
-Use when the agent needs to **write** checkpoints continuously during a run — for crash resilience, replay-with-modifications, or to back planner agents that survive restarts.
-
-Add the dependency:
-
-```kotlin
-implementation("ai.koog:agents-features-persistence-jdbc:1.3.0")
-// or another persistence backend module — JDBC is one of several
-```
-
-Install in the agent's trailing lambda:
-
-```kotlin
-import ai.koog.agents.features.persistence.Persistence
-
-val agent = AIAgent(
-    promptExecutor = ...,
-    llmModel = ...,
-    systemPrompt = "...",
-) {
-    install(Persistence) {
-        // backend-specific config — JDBC URL + credentials, or in-memory for tests
-        // type names use `Persistence*` spelling — `Persistency*` from pre-1.0 was renamed
+suspend fun replayCheckpoint(
+    agent: AIAgent<String, String>,
+    checkpoint: AgentCheckpointData,
+): String {
+    requireNotNull(checkpoint.graphProperties) {
+        "Supply a graph checkpoint; recover planner checkpoints with installed Persistence and a stable session ID"
     }
+    return Persistence.runFromCheckpoint(
+        agent = agent,
+        input = "",
+        checkpoint = checkpoint,
+    )
 }
 ```
 
-Tune checkpoint frequency to the run. Checkpoint every N steps or at phase boundaries. Reserve every-step writes for runs where redoing a single step justifies the overhead.
+This helper accepts graph checkpoints only. Koog 1.3 casts restored state to
+`GraphAgentContextData`; a planner checkpoint cannot use this helper. Choose Step 2
+for planner recovery. The agent must use the matching graph and node names. Replay resumes **after** the
+saved node using `graphProperties.lastOutput`; changing `input` does not replace
+that saved output. This helper does not require installing Persistence and does
+not create new checkpoints. `agent.runFromCheckpoint` is not a Koog 1.3 member.
 
-For planner agents specifically: 1.0 added checkpoint support for planner state (KG-673). `AIAgentStorage` is serialized into checkpoints automatically, so any `createStorageKey<T>` value with a `@Serializable` type rides along — non-serializable types break checkpointing silently (invoke `Skill(skill: "manage-state")` for the serialization constraints).
+`AgentCheckpointData` carries `checkpointId`, `createdAt`, `version`, message history,
+serialized storage, and graph or planner properties. Graph state uses
+`graphProperties.nodePath` and `graphProperties.lastOutput`. The provider indexes
+checkpoints by session ID; it is not a field on the checkpoint payload. Load
+persisted payloads through the provider rather than constructing an obsolete shape.
 
-The corresponding pipeline interfaces also split in 1.0: `AIAgentPipeline` → `AIAgentPipelineAPI` + `AIAgentGraphPipeline` / `AIAgentPlannerPipeline`. Code that referenced the old interface needs updating.
+Finish here.
+
+## Step 2 — Automatic Durable Checkpoints
+
+Add `ai.koog:agents-features-persistence-jdbc:1.3.0` for JDBC. This includes the
+`agents-features-snapshot` module containing Persistence. Add a PostgreSQL JDBC
+driver. Preserve the existing graph or planner strategy; the install block applies
+to both. Planner agents retain `ai.koog:agents-planner:1.3.0-beta`. The factories in
+`skills/add-persistence/references/durable-agents.md` demonstrate the graph overload.
+Read that reference and write the selected backend and agent factory to
+`src/main/kotlin/com/example/DurableAgent.kt`.
+
+Write the consumer project's `.env.example` with placeholders and documentation
+for these settings, all required when using the PostgreSQL factory:
+
+- `CHECKPOINT_JDBC_URL`: JDBC connection URL from the database service's connection settings.
+- `CHECKPOINT_DB_USER`: database role provisioned by the database administrator or service.
+- `CHECKPOINT_DB_PASSWORD`: that role's credential from the database administrator or credential store.
+
+Run with a stable work-item session ID: `agent.run(input, sessionId = workItemId)`.
+After an interruption, recreate the agent with the same graph, durable provider and
+session ID and call `run` again. Persistence restores the latest non-tombstone
+checkpoint automatically. Completed runs write a tombstone; the same session then
+starts a new run. Explicit graph replay uses Step 1. Planner recovery uses installed Persistence
+and the same provider/session ID, not the graph-only replay helper. For a supplied
+planner checkpoint, choose a fresh session ID, save it to that provider under the
+new ID, and run with that ID. Existing sessions may select a newer checkpoint or
+reject a duplicate version.
+
+For local disk storage, add `ai.koog:agents-features-snapshot:1.3.0` and use this
+file factory from `skills/add-persistence/references/durable-agents.md` with a
+persistent directory.
+
+The default storage provider is a no-op. In-memory storage does not survive a
+process restart. Automatic graph persistence writes after each nontechnical node;
+`enableAutomaticPersistence` is a boolean, not an every-N-steps configuration.
+Use explicit save points with automatic persistence disabled for coarser frequency.
+Custom planners must pass matching non-null `stateType` and `planType` tokens to
+the `AIAgentPlanner` base constructor. Built-in `SimpleLLMPlanner` supplies these
+tokens. Planner state and plans must serialize with the configured serializer.
+Keep node outputs and storage values serializable with the configured serializer;
+unserializable outputs can skip a checkpoint. Custom data classes need a supported
+serializer, such as `@Serializable` with Kotlinx. Invoke `Skill(skill: "manage-state")`
+for typed storage. Checkpoint replay can repeat external side effects; use idempotent
+operations or configure rollback tools for the application.
+
+Finish here.
+
+## Step 3 — Conversation History
+
+Invoke `Skill(skill: "persist-chat-history")` and execute its JDBC/provider flow.
+Conversation history restores messages across visits; execution checkpoints restore
+an interrupted run's position and state.
+
+Finish here.
+
+## Step 4 — Explicit Forks
+
+Invoke `Skill(skill: "snapshot-and-restore")` and execute its manual-save/fork flow.
 
 Finish here.

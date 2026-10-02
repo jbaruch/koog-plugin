@@ -14,6 +14,7 @@ dependencies {
     implementation("ai.koog:koog-agents:1.3.0")
     implementation("ai.koog:agents-features-longterm-memory:1.3.0-beta")
     implementation("ai.koog:agents-features-chat-history-jdbc:1.3.0")
+    implementation("ai.koog:agents-features-persistence-jdbc:1.3.0")
     implementation("ai.koog:agents-features-opentelemetry:1.3.0")
     implementation("ai.koog:prompt-executor-google-client:1.3.0-beta")
     implementation("ai.koog:prompt-executor-llms-all:1.3.0-beta")
@@ -72,6 +73,10 @@ val examples =
         "RuntimePrompt" to "define-prompt/SKILL.md",
         "SqlLookup" to "query-sql-from-agent/SKILL.md",
         "FunctionalAgent" to "use-functional-agent/SKILL.md",
+        "CheckpointReplay" to "add-persistence/SKILL.md",
+        "JdbcCheckpointAgent" to "add-persistence/references/durable-agents.md",
+        "FileCheckpointAgent" to "add-persistence/references/durable-agents.md",
+        "CheckpointFork" to "snapshot-and-restore/references/checkpoint-fork.md",
     )
 val generatedExamples = layout.buildDirectory.dir("generated/examples")
 val extractExamples by tasks.registering {

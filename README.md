@@ -48,8 +48,8 @@ Two **always-on rules** carry the gotchas every Koog project hits — module coo
 | Skill | What it does |
 |---|---|
 | `manage-state` | `AIAgentStorage`, history compression, `LongTermMemory` (replaces removed `AgentMemory`) |
-| `add-persistence` | Continuous checkpointing + `runFromCheckpoint` for crash resilience |
-| `snapshot-and-restore` | Caller-triggered save points for explicit fork/replay |
+| `add-persistence` | Automatic durable checkpoints + `Persistence.runFromCheckpoint` replay |
+| `snapshot-and-restore` | Manual Persistence save points for explicit fork/replay |
 | `persist-chat-history` | `ChatMemory` with JDBC, AgentCore, or SQL-backed providers — resume conversations by session |
 
 ### Integrations

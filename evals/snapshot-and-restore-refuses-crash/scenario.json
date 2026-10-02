@@ -1,1 +1,1 @@
-{ "description": "Redirect from Snapshot to Persistence for automatic crash recovery" }
+{ "description": "Choose automatic durable checkpoints for crash recovery without manual save calls" }
