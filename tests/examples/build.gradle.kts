@@ -21,7 +21,7 @@ dependencies {
     implementation("ai.koog:skills:1.3.0-beta")
     implementation("ai.koog:agents-ext:1.3.0-beta")
     implementation("ai.koog:agents-cli:1.3.0-beta")
-    implementation("org.postgresql:postgresql:42.7.10")
+    implementation("org.postgresql:postgresql:42.7.13")
     testImplementation("ai.koog:agents-test:1.3.0")
     testImplementation("com.h2database:h2:2.4.240")
     testImplementation(kotlin("test-junit5"))
