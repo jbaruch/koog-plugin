@@ -22,7 +22,10 @@ All notable changes to this plugin are documented here. Format: [Keep a Changelo
   PostgreSQL settings include purpose/source documentation and variable-specific
   error messages; fork validation errors identify the required serializer or graph.
   Explicit replay rejects planner checkpoints; planner recovery uses the installed
-  feature and stable session. Database settings reject blank values.
+  feature and stable session. Custom planner state/plan type tokens and serialization
+  requirements are documented and scored. Database settings reject blank values.
+- Long durable-provider and fork examples live in linked references; the compiler
+  fixture continues to extract those published examples.
 - Linked this repository to its Tessl project so future evals retain the same history.
 
 ### Validation

@@ -28,9 +28,9 @@
       "description": "Recreates the planner agent against the same durable provider and runs with the same stable sessionId so Persistence restores the latest non-tombstone planner checkpoint automatically. Does not pass a planner checkpoint to Persistence.runFromCheckpoint: Koog 1.3 explicitly restores GraphAgentContextData in that helper."
     },
     {
-      "name": "Notes serializability requirement for storage",
+      "name": "Supports planner and storage serialization",
       "max_score": 5,
-      "description": "Notes that saved node outputs and storage values must serialize with the configured serializer. Custom data classes need a supported serializer such as Kotlinx @Serializable; unsupported outputs can cause checkpoints to be skipped."
+      "description": "Planner persistence requires matching non-null stateType and planType tokens on AIAgentPlanner and serializable state, plans and storage values. Built-in SimpleLLMPlanner already supplies the tokens; do not require redundant manual configuration. A custom planner must supply them to its base constructor. Custom data classes need a supported serializer such as Kotlinx @Serializable."
     }
   ]
 }

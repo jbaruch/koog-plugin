@@ -124,10 +124,14 @@ If the code uses persistence/checkpoints:
 - Use current Persistence feature/provider types.
 - Replace the no-op `NoPersistencyStorageProvider` with durable storage for crash recovery.
 - Use `AIAgentGraphPipeline` for graph features and `AIAgentPlannerPipeline` for planner features; shared pipeline contracts use `AIAgentPipelineAPI`.
-- `AgentCheckpointData` is in `ai.koog.agents.snapshot.feature`. Current graph checkpoints use
-  `graphProperties.nodePath` and `graphProperties.lastOutput`; planner checkpoints use
-  `plannerProperties`. The payload has `checkpointId`, `createdAt`, `version`, message history
-  and serialized storage. Do not construct the obsolete `properties.lastInput` shape.
+- Import `AgentCheckpointData` from `ai.koog.agents.snapshot.feature`.
+- Use `graphProperties.nodePath` and `graphProperties.lastOutput` for graph checkpoints.
+- Use `plannerProperties` for planner checkpoints.
+- Preserve `checkpointId`, `createdAt`, `version`, message history and serialized storage.
+- Replace the obsolete `properties.lastInput` payload shape.
+- Custom planners must pass matching non-null `stateType` and `planType` tokens to
+  the `AIAgentPlanner` base constructor; built-in `SimpleLLMPlanner` supplies both.
+- Keep planner state, plans and storage values serializable with the configured serializer.
 - For graph replay, replace `agent.runFromCheckpoint(checkpoint)` with
   `Persistence.runFromCheckpoint(agent, input, checkpoint)`.
 - Recover planner checkpoints through installed Persistence and the same provider/session ID;

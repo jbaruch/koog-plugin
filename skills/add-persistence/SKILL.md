@@ -61,54 +61,10 @@ Finish here.
 Add `ai.koog:agents-features-persistence-jdbc:1.3.0` for JDBC. This includes the
 `agents-features-snapshot` module containing Persistence. Add a PostgreSQL JDBC
 driver. Preserve the existing graph or planner strategy; the install block applies
-to both. Planner agents retain `ai.koog:agents-planner:1.3.0-beta`. The factory below
-demonstrates the graph overload. Write the backend and agent factory to
+to both. Planner agents retain `ai.koog:agents-planner:1.3.0-beta`. The factories in
+`skills/add-persistence/references/durable-agents.md` demonstrate the graph overload.
+Read that reference and write the selected backend and agent factory to
 `src/main/kotlin/com/example/DurableAgent.kt`.
-
-<!-- compile-example: JdbcCheckpointAgent -->
-```kotlin
-import ai.koog.agents.core.agent.AIAgent
-import ai.koog.agents.core.agent.entity.AIAgentGraphStrategy
-import ai.koog.agents.features.persistence.jdbc.PostgresJdbcPersistenceStorageProvider
-import ai.koog.agents.snapshot.feature.Persistence
-import ai.koog.prompt.executor.clients.openai.OpenAIModels
-import ai.koog.prompt.executor.model.PromptExecutor
-import org.postgresql.ds.PGSimpleDataSource
-
-suspend fun jdbcCheckpointAgent(
-    executor: PromptExecutor,
-    graph: AIAgentGraphStrategy<String, String>,
-): AIAgent<String, String> {
-    val dataSource =
-        PGSimpleDataSource().apply {
-            setURL(
-                requireNotNull(System.getenv("CHECKPOINT_JDBC_URL")?.takeIf { it.isNotBlank() }) {
-                    "Set CHECKPOINT_JDBC_URL to the database JDBC URL; see .env.example"
-                },
-            )
-            user =
-                requireNotNull(System.getenv("CHECKPOINT_DB_USER")?.takeIf { it.isNotBlank() }) {
-                    "Set CHECKPOINT_DB_USER to a provisioned database role; see .env.example"
-                }
-            password =
-                requireNotNull(System.getenv("CHECKPOINT_DB_PASSWORD")?.takeIf { it.isNotBlank() }) {
-                    "Set CHECKPOINT_DB_PASSWORD from the database credential store; see .env.example"
-                }
-        }
-    val provider = PostgresJdbcPersistenceStorageProvider(dataSource)
-    provider.migrate()
-    return AIAgent(
-        promptExecutor = executor,
-        llmModel = OpenAIModels.Chat.GPT4o,
-        strategy = graph,
-    ) {
-        install(Persistence) {
-            storage = provider
-            enableAutomaticPersistence = true
-        }
-    }
-}
-```
 
 Write the consumer project's `.env.example` with placeholders and documentation
 for these settings, all required when using the PostgreSQL factory:
@@ -126,39 +82,16 @@ and the same provider/session ID, not the graph-only replay helper. For a suppli
 planner checkpoint, save it to that provider under the session ID before running.
 
 For local disk storage, add `ai.koog:agents-features-snapshot:1.3.0` and use this
-factory with a persistent directory, not a temporary directory.
-
-<!-- compile-example: FileCheckpointAgent -->
-```kotlin
-import ai.koog.agents.core.agent.AIAgent
-import ai.koog.agents.core.agent.entity.AIAgentGraphStrategy
-import ai.koog.agents.snapshot.feature.Persistence
-import ai.koog.agents.snapshot.providers.file.JVMFilePersistenceStorageProvider
-import ai.koog.prompt.executor.clients.openai.OpenAIModels
-import ai.koog.prompt.executor.model.PromptExecutor
-import java.nio.file.Path
-
-fun fileCheckpointAgent(
-    executor: PromptExecutor,
-    graph: AIAgentGraphStrategy<String, String>,
-    directory: Path,
-): AIAgent<String, String> =
-    AIAgent(
-        promptExecutor = executor,
-        llmModel = OpenAIModels.Chat.GPT4o,
-        strategy = graph,
-    ) {
-        install(Persistence) {
-            storage = JVMFilePersistenceStorageProvider(directory)
-            enableAutomaticPersistence = true
-        }
-    }
-```
+file factory from `skills/add-persistence/references/durable-agents.md` with a
+persistent directory.
 
 The default storage provider is a no-op. In-memory storage does not survive a
 process restart. Automatic graph persistence writes after each nontechnical node;
 `enableAutomaticPersistence` is a boolean, not an every-N-steps configuration.
 Use explicit save points with automatic persistence disabled for coarser frequency.
+Custom planners must pass matching non-null `stateType` and `planType` tokens to
+the `AIAgentPlanner` base constructor. Built-in `SimpleLLMPlanner` supplies these
+tokens. Planner state and plans must serialize with the configured serializer.
 Keep node outputs and storage values serializable with the configured serializer;
 unserializable outputs can skip a checkpoint. Custom data classes need a supported
 serializer, such as `@Serializable` with Kotlinx. Invoke `Skill(skill: "manage-state")`

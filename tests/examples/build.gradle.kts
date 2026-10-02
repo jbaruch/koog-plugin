@@ -74,9 +74,9 @@ val examples =
         "SqlLookup" to "query-sql-from-agent/SKILL.md",
         "FunctionalAgent" to "use-functional-agent/SKILL.md",
         "CheckpointReplay" to "add-persistence/SKILL.md",
-        "JdbcCheckpointAgent" to "add-persistence/SKILL.md",
-        "FileCheckpointAgent" to "add-persistence/SKILL.md",
-        "CheckpointFork" to "snapshot-and-restore/SKILL.md",
+        "JdbcCheckpointAgent" to "add-persistence/references/durable-agents.md",
+        "FileCheckpointAgent" to "add-persistence/references/durable-agents.md",
+        "CheckpointFork" to "snapshot-and-restore/references/checkpoint-fork.md",
     )
 val generatedExamples = layout.buildDirectory.dir("generated/examples")
 val extractExamples by tasks.registering {
