@@ -19,7 +19,8 @@ round trips, discovery snapshots and rediscovery, arbitrary absolute
 paths accepted by the default read-only reader, and synthetic inherited billing
 variables passed through the CLI process transport. Checkpoint tests recreate a
 disk provider after an interrupted run, verify completed-session tombstones,
-replay without a write-side feature and fork without repeating the prefix. No live model, telemetry,
+replay without a write-side feature, reject planner state in the graph-only helper,
+and fork without repeating the prefix. No live model, telemetry,
 database, vendor CLI, or private-file access is required.
 Prepared-query tests use a temporary local H2 database to verify interval filtering,
 result caps and invalid-input rejection without production credentials.

@@ -1,20 +1,19 @@
 ---
 name: add-persistence
 description: >
-  Add checkpoint-and-resume to a Koog 1.3 agent. Use Persistence.runFromCheckpoint
-  for replay of a supplied checkpoint, or install Persistence with durable storage
-  for automatic crash recovery. Use when the user asks to make an agent resumable,
-  checkpoint execution, or restart an interrupted workflow.
+  Route Koog 1.3 graph checkpoint replay, automatic durable recovery, conversation
+  history and explicit forks. Use when the user asks to make an agent resumable,
+  restart an interrupted workflow, resume a conversation, or fork from saved state.
 ---
 
 # Add Persistence Skill
 
 This skill is an action router — pick the step that matches the user's intent and execute only that step. Do not run other steps; do not parallelize.
 
-- Saved checkpoint, replay only: Step 1.
-- Automatic crash recovery: Step 2.
-- Conversation history across visits: invoke `Skill(skill: "persist-chat-history")`.
-- Explicit save point and fork: invoke `Skill(skill: "snapshot-and-restore")`.
+- **Step 1** — Replay a saved graph checkpoint.
+- **Step 2** — Automatic crash recovery for graph or planner agents.
+- **Step 3** — Conversation history across visits.
+- **Step 4** — Explicit save points and forks.
 
 ## Step 1 — Replay a Saved Checkpoint
 
@@ -30,15 +29,21 @@ import ai.koog.agents.snapshot.feature.Persistence
 suspend fun replayCheckpoint(
     agent: AIAgent<String, String>,
     checkpoint: AgentCheckpointData,
-): String =
-    Persistence.runFromCheckpoint(
+): String {
+    requireNotNull(checkpoint.graphProperties) {
+        "Supply a graph checkpoint; recover planner checkpoints with installed Persistence and a stable session ID"
+    }
+    return Persistence.runFromCheckpoint(
         agent = agent,
         input = "",
         checkpoint = checkpoint,
     )
+}
 ```
 
-The agent must use the matching graph and node names. Replay resumes **after** the
+This helper accepts graph checkpoints only. Koog 1.3 casts restored state to
+`GraphAgentContextData`; a planner checkpoint cannot use this helper. Choose Step 2
+for planner recovery. The agent must use the matching graph and node names. Replay resumes **after** the
 saved node using `graphProperties.lastOutput`; changing `input` does not replace
 that saved output. This helper does not require installing Persistence and does
 not create new checkpoints. `agent.runFromCheckpoint` is not a Koog 1.3 member.
@@ -77,16 +82,16 @@ suspend fun jdbcCheckpointAgent(
     val dataSource =
         PGSimpleDataSource().apply {
             setURL(
-                requireNotNull(System.getenv("CHECKPOINT_JDBC_URL")) {
+                requireNotNull(System.getenv("CHECKPOINT_JDBC_URL")?.takeIf { it.isNotBlank() }) {
                     "Set CHECKPOINT_JDBC_URL to the database JDBC URL; see .env.example"
                 },
             )
             user =
-                requireNotNull(System.getenv("CHECKPOINT_DB_USER")) {
+                requireNotNull(System.getenv("CHECKPOINT_DB_USER")?.takeIf { it.isNotBlank() }) {
                     "Set CHECKPOINT_DB_USER to a provisioned database role; see .env.example"
                 }
             password =
-                requireNotNull(System.getenv("CHECKPOINT_DB_PASSWORD")) {
+                requireNotNull(System.getenv("CHECKPOINT_DB_PASSWORD")?.takeIf { it.isNotBlank() }) {
                     "Set CHECKPOINT_DB_PASSWORD from the database credential store; see .env.example"
                 }
         }
@@ -116,7 +121,9 @@ Run with a stable work-item session ID: `agent.run(input, sessionId = workItemId
 After an interruption, recreate the agent with the same graph, durable provider and
 session ID and call `run` again. Persistence restores the latest non-tombstone
 checkpoint automatically. Completed runs write a tombstone; the same session then
-starts a new run. Explicit replay uses Step 1.
+starts a new run. Explicit graph replay uses Step 1. Planner recovery uses installed Persistence
+and the same provider/session ID, not the graph-only replay helper. For a supplied
+planner checkpoint, save it to that provider under the session ID before running.
 
 For local disk storage, add `ai.koog:agents-features-snapshot:1.3.0` and use this
 factory with a persistent directory, not a temporary directory.
@@ -157,5 +164,19 @@ unserializable outputs can skip a checkpoint. Custom data classes need a support
 serializer, such as `@Serializable` with Kotlinx. Invoke `Skill(skill: "manage-state")`
 for typed storage. Checkpoint replay can repeat external side effects; use idempotent
 operations or configure rollback tools for the application.
+
+Finish here.
+
+## Step 3 — Conversation History
+
+Invoke `Skill(skill: "persist-chat-history")` and execute its JDBC/provider flow.
+Conversation history restores messages across visits; execution checkpoints restore
+an interrupted run's position and state.
+
+Finish here.
+
+## Step 4 — Explicit Forks
+
+Invoke `Skill(skill: "snapshot-and-restore")` and execute its manual-save/fork flow.
 
 Finish here.

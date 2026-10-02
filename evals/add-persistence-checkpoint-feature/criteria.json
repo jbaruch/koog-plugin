@@ -25,7 +25,7 @@
     {
       "name": "Demonstrates a valid restart path",
       "max_score": 10,
-      "description": "Recreates the agent against the same durable provider and calls run with the same stable sessionId so Persistence restores the latest non-tombstone checkpoint automatically; alternatively explicitly loads a checkpoint and calls Persistence.runFromCheckpoint(agent, input, checkpoint). agent.runFromCheckpoint(checkpoint) is nonexistent and does not satisfy this criterion."
+      "description": "Recreates the planner agent against the same durable provider and runs with the same stable sessionId so Persistence restores the latest non-tombstone planner checkpoint automatically. Does not pass a planner checkpoint to Persistence.runFromCheckpoint: Koog 1.3 explicitly restores GraphAgentContextData in that helper."
     },
     {
       "name": "Notes serializability requirement for storage",

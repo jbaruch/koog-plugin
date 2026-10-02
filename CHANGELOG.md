@@ -21,13 +21,16 @@ All notable changes to this plugin are documented here. Format: [Keep a Changelo
 - Migration guidance now uses the current checkpoint payload and replay APIs.
   PostgreSQL settings include purpose/source documentation and variable-specific
   error messages; fork validation errors identify the required serializer or graph.
+  Explicit replay rejects planner checkpoints; planner recovery uses the installed
+  feature and stable session. Database settings reject blank values.
 - Linked this repository to its Tessl project so future evals retain the same history.
 
 ### Validation
 
-Four additional published fences compile. Three deterministic tests verify durable
-restart and tombstones, feature-free replay, and independent forks without repeating
-saved prefix work. The 17 behavior tests use no live models or external services.
+Four additional published fences compile. Four deterministic tests verify durable
+restart and tombstones, feature-free graph replay, planner-checkpoint rejection,
+and independent forks without repeating saved prefix work. The 18 behavior tests
+use no live models or external services.
 
 ## [0.6.0] — 2026-10-01
 

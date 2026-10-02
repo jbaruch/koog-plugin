@@ -3,11 +3,14 @@ package verified
 import ai.koog.agents.core.agent.AIAgent
 import ai.koog.agents.core.dsl.builder.node
 import ai.koog.agents.core.dsl.builder.strategy
+import ai.koog.agents.core.planner.PlannerAgentExecutionPoint
 import ai.koog.agents.snapshot.feature.AgentCheckpointData
+import ai.koog.agents.snapshot.feature.PlannerCheckpointProperties
 import ai.koog.agents.snapshot.feature.isTombstone
 import ai.koog.agents.snapshot.providers.file.JVMFilePersistenceStorageProvider
 import ai.koog.agents.testing.tools.getMockExecutor
 import ai.koog.prompt.executor.clients.openai.OpenAIModels
+import ai.koog.serialization.JSONNull
 import ai.koog.serialization.JSONPrimitive
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
@@ -16,6 +19,7 @@ import java.nio.file.Path
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
+import kotlin.time.Instant
 
 class CheckpointBehaviorTest {
     @TempDir
@@ -74,6 +78,34 @@ class CheckpointBehaviorTest {
                 assertEquals(0, prefixRuns)
             } finally {
                 reader.close()
+            }
+        }
+
+    @Test
+    fun explicitGraphReplayRejectsPlannerStateBeforeTheUpstreamCast() =
+        runBlocking {
+            val checkpoint =
+                AgentCheckpointData(
+                    checkpointId = "planner-checkpoint",
+                    createdAt = Instant.parse("2025-01-01T00:00:00Z"),
+                    messageHistory = emptyList(),
+                    version = 0L,
+                    plannerProperties =
+                        PlannerCheckpointProperties(
+                            executionPoint = PlannerAgentExecutionPoint.PlanCreated,
+                            state = JSONNull,
+                            plan = JSONNull,
+                        ),
+                )
+            val agent =
+                AIAgent(
+                    promptExecutor = getMockExecutor { },
+                    llmModel = OpenAIModels.Chat.GPT4o,
+                )
+            try {
+                assertFailsWith<IllegalArgumentException> { replayCheckpoint(agent, checkpoint) }
+            } finally {
+                agent.close()
             }
         }
 

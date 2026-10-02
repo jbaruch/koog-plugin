@@ -1,3 +1,1 @@
-{
-  "description": "Choose automatic durable checkpoints for crash recovery without manual save calls"
-}
+{ "description": "Choose automatic durable checkpoints for crash recovery without manual save calls" }
