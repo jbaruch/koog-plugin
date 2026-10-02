@@ -32,7 +32,8 @@ Run the initial prefix once and retain the `AgentCheckpointData` supplied to
 saved node. The two copies replace its serialized output for the continuation;
 changing the ordinary `input` argument alone does not change the restored output.
 Use distinct session IDs for independent branches and stable matching graph/node
-names. Forks preserve the saved prefix history and typed storage.
+names. Forks preserve the saved prefix history and typed storage. The capture run finishes
+without executing the continuation; only the two restored branches execute it.
 
 In-memory storage is suitable for same-process comparison. For later process
 restarts, replace it with a durable provider and retrieve the saved checkpoint by

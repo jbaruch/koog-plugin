@@ -14,6 +14,8 @@ All notable changes to this plugin are documented here. Format: [Keep a Changelo
   `createCheckpointAfterNode`. The separate Snapshot feature, `snapshot()` and
   `runFromSnapshot()` previously documented do not exist in Koog 1.3.
   Forks explicitly vary the restored continuation output, not the ordinary input.
+  Capturing a save point ends before continuation; only the two restored branches
+  run continuation work.
 - Checkpoint payload fields, no-op defaults, serialization failures and completed-run
   tombstones are documented. The three checkpoint eval rubrics no longer reward
   nonexistent APIs or reject a valid automatic restart path. The fork task no
@@ -22,7 +24,8 @@ All notable changes to this plugin are documented here. Format: [Keep a Changelo
   PostgreSQL settings include purpose/source documentation and variable-specific
   error messages; fork validation errors identify the required serializer or graph.
   Explicit replay rejects planner checkpoints; planner recovery uses the installed
-  feature and stable session. Custom planner state/plan type tokens and serialization
+  feature and stable session. Importing a supplied planner checkpoint uses a fresh
+  session to avoid checkpoint ordering/version collisions. Custom planner state/plan type tokens and serialization
   requirements are documented and scored. Database settings reject blank values.
 - Long durable-provider and fork examples live in linked references; the compiler
   fixture continues to extract those published examples.

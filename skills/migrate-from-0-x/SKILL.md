@@ -123,7 +123,9 @@ If the code uses persistence/checkpoints:
 
 - Use current Persistence feature/provider types.
 - Replace the no-op `NoPersistencyStorageProvider` with durable storage for crash recovery.
-- Use `AIAgentGraphPipeline` for graph features and `AIAgentPlannerPipeline` for planner features; shared pipeline contracts use `AIAgentPipelineAPI`.
+- Use `AIAgentGraphPipeline` for graph features.
+- Use `AIAgentPlannerPipeline` for planner features.
+- Use `AIAgentPipelineAPI` for shared pipeline contracts.
 - Import `AgentCheckpointData` from `ai.koog.agents.snapshot.feature`.
 - Use `graphProperties.nodePath` and `graphProperties.lastOutput` for graph checkpoints.
 - Use `plannerProperties` for planner checkpoints.
@@ -134,8 +136,8 @@ If the code uses persistence/checkpoints:
 - Keep planner state, plans and storage values serializable with the configured serializer.
 - For graph replay, replace `agent.runFromCheckpoint(checkpoint)` with
   `Persistence.runFromCheckpoint(agent, input, checkpoint)`.
-- Recover planner checkpoints through installed Persistence and the same provider/session ID;
-  the explicit helper restores graph state only.
+- Recover planner checkpoints through installed Persistence and the same provider/session ID.
+- Use the explicit replay helper for graph checkpoints only.
 - Invoke `Skill(skill: "add-persistence")` for durable providers and automatic restart.
 - Replace nonexistent `Snapshot`, `snapshot()` and `runFromSnapshot()` examples with
   the Persistence save/replay APIs.

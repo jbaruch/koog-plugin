@@ -79,7 +79,9 @@ session ID and call `run` again. Persistence restores the latest non-tombstone
 checkpoint automatically. Completed runs write a tombstone; the same session then
 starts a new run. Explicit graph replay uses Step 1. Planner recovery uses installed Persistence
 and the same provider/session ID, not the graph-only replay helper. For a supplied
-planner checkpoint, save it to that provider under the session ID before running.
+planner checkpoint, choose a fresh session ID, save it to that provider under the
+new ID, and run with that ID. Existing sessions may select a newer checkpoint or
+reject a duplicate version.
 
 For local disk storage, add `ai.koog:agents-features-snapshot:1.3.0` and use this
 file factory from `skills/add-persistence/references/durable-agents.md` with a

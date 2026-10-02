@@ -2,7 +2,8 @@
 
 Add `ai.koog:agents-features-snapshot:1.3.0`. Adapt the prefix and continuation
 nodes to the existing graph. This in-memory example compares two continuations
-from one saved checkpoint without repeating the prefix. Use durable storage for
+from one saved checkpoint without repeating the prefix. The capture output ends
+the initial run; only explicitly tagged fork outputs enter the continuation. Use durable storage for
 recovery in a later process.
 
 <!-- compile-example: CheckpointFork -->
@@ -24,6 +25,7 @@ fun checkpointForkAgent(
     executor: PromptExecutor,
     onPrefix: () -> Unit,
     onCheckpoint: (AgentCheckpointData) -> Unit,
+    onContinuation: (String) -> Unit = {},
 ): AIAgent<String, String> {
     val graph =
         strategy<String, String>("checkpoint-fork") {
@@ -32,12 +34,13 @@ fun checkpointForkAgent(
                 input
             }
             val branchPoint by node<String, String> { input ->
+                val captureOutput = "capture:$input"
                 val checkpoint =
                     withPersistence { context ->
                         createCheckpointAfterNode(
                             agentContext = context,
                             nodePath = context.executionInfo.path(),
-                            lastOutput = input,
+                            lastOutput = captureOutput,
                             lastOutputType = typeToken<String>(),
                             version = 0L,
                         )
@@ -47,12 +50,17 @@ fun checkpointForkAgent(
                         "Register a supported serializer and ensure node output and stored values are serializable"
                     },
                 )
-                input
+                captureOutput
             }
-            val continueBranch by node<String, String> { input -> "result:$input" }
+            val continueBranch by node<String, String> { input ->
+                val variant = input.removePrefix("fork:")
+                onContinuation(variant)
+                "result:$variant"
+            }
             edge(nodeStart forwardTo prepare)
             edge(prepare forwardTo branchPoint)
-            edge(branchPoint forwardTo continueBranch)
+            edge(branchPoint forwardTo continueBranch onCondition { it.startsWith("fork:") })
+            edge(branchPoint forwardTo nodeFinish onCondition { it.startsWith("capture:") })
             edge(continueBranch forwardTo nodeFinish)
         }
     return AIAgent(
@@ -86,7 +94,7 @@ suspend fun compareCheckpointBranches(
                     messageHistory = checkpoint.messageHistory,
                     llmParams = checkpoint.llmParams,
                     version = checkpoint.version,
-                    graphProperties = graphState.copy(lastOutput = JSONPrimitive(variant)),
+                    graphProperties = graphState.copy(lastOutput = JSONPrimitive("fork:$variant")),
                     properties = checkpoint.properties,
                     llmModel = checkpoint.llmModel,
                     tools = checkpoint.tools,

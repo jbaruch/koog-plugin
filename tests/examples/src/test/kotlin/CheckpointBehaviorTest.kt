@@ -30,14 +30,23 @@ class CheckpointBehaviorTest {
         runBlocking {
             var prefixRuns = 0
             val saved = mutableListOf<AgentCheckpointData>()
-            val agent = checkpointForkAgent(getMockExecutor { }, { prefixRuns++ }, { saved.add(it) })
+            val continuations = mutableListOf<String>()
+            val agent =
+                checkpointForkAgent(
+                    getMockExecutor { },
+                    { prefixRuns++ },
+                    { saved.add(it) },
+                    { continuations.add(it) },
+                )
             try {
-                assertEquals("result:seed", agent.run("seed", sessionId = "prefix"))
+                assertEquals("capture:seed", agent.run("seed", sessionId = "prefix"))
+                assertTrue(continuations.isEmpty())
                 assertEquals(1, saved.size)
                 assertEquals("result:A" to "result:B", compareCheckpointBranches(agent, saved.single()))
+                assertEquals(listOf("A", "B"), continuations)
                 assertEquals(1, prefixRuns)
                 assertEquals(1, saved.size)
-                assertEquals(JSONPrimitive("seed"), saved.single().graphProperties?.lastOutput)
+                assertEquals(JSONPrimitive("capture:seed"), saved.single().graphProperties?.lastOutput)
             } finally {
                 agent.close()
             }
@@ -61,10 +70,11 @@ class CheckpointBehaviorTest {
                         input
                     }
                     val branchPoint by node<String, String> { it }
-                    val continueBranch by node<String, String> { "result:$it" }
+                    val continueBranch by node<String, String> { "result:${it.removePrefix("fork:")}" }
                     edge(nodeStart forwardTo prepare)
                     edge(prepare forwardTo branchPoint)
-                    edge(branchPoint forwardTo continueBranch)
+                    edge(branchPoint forwardTo continueBranch onCondition { it.startsWith("fork:") })
+                    edge(branchPoint forwardTo nodeFinish onCondition { it.startsWith("capture:") })
                     edge(continueBranch forwardTo nodeFinish)
                 }
             val reader =
@@ -74,7 +84,7 @@ class CheckpointBehaviorTest {
                     strategy = graph,
                 )
             try {
-                assertEquals("result:saved-output", replayCheckpoint(reader, saved.single()))
+                assertEquals("capture:saved-output", replayCheckpoint(reader, saved.single()))
                 assertEquals(0, prefixRuns)
             } finally {
                 reader.close()
