@@ -63,7 +63,11 @@ fun checkpointForkAgent(
                             version = 0L,
                         )
                     }
-                onCheckpoint(requireNotNull(checkpoint) { "Checkpoint serialization failed" })
+                onCheckpoint(
+                    requireNotNull(checkpoint) {
+                        "Register a supported serializer and ensure node output and stored values are serializable"
+                    },
+                )
                 input
             }
             val continueBranch by node<String, String> { input -> "result:$input" }
@@ -88,7 +92,10 @@ suspend fun compareCheckpointBranches(
     agent: AIAgent<String, String>,
     checkpoint: AgentCheckpointData,
 ): Pair<String, String> {
-    val graphState = requireNotNull(checkpoint.graphProperties)
+    val graphState =
+        requireNotNull(checkpoint.graphProperties) {
+            "Supply a checkpoint from the matching graph strategy; planner checkpoints cannot be forked here"
+        }
     suspend fun branch(variant: String): String =
         Persistence.runFromCheckpoint(
             agent = agent,

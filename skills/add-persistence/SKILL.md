@@ -76,9 +76,19 @@ suspend fun jdbcCheckpointAgent(
 ): AIAgent<String, String> {
     val dataSource =
         PGSimpleDataSource().apply {
-            setURL(requireNotNull(System.getenv("CHECKPOINT_JDBC_URL")))
-            user = requireNotNull(System.getenv("CHECKPOINT_DB_USER"))
-            password = requireNotNull(System.getenv("CHECKPOINT_DB_PASSWORD"))
+            setURL(
+                requireNotNull(System.getenv("CHECKPOINT_JDBC_URL")) {
+                    "Set CHECKPOINT_JDBC_URL to the database JDBC URL; see .env.example"
+                },
+            )
+            user =
+                requireNotNull(System.getenv("CHECKPOINT_DB_USER")) {
+                    "Set CHECKPOINT_DB_USER to a provisioned database role; see .env.example"
+                }
+            password =
+                requireNotNull(System.getenv("CHECKPOINT_DB_PASSWORD")) {
+                    "Set CHECKPOINT_DB_PASSWORD from the database credential store; see .env.example"
+                }
         }
     val provider = PostgresJdbcPersistenceStorageProvider(dataSource)
     provider.migrate()
@@ -94,6 +104,13 @@ suspend fun jdbcCheckpointAgent(
     }
 }
 ```
+
+Write the consumer project's `.env.example` with placeholders and documentation
+for these settings, all required when using the PostgreSQL factory:
+
+- `CHECKPOINT_JDBC_URL`: JDBC connection URL from the database service's connection settings.
+- `CHECKPOINT_DB_USER`: database role provisioned by the database administrator or service.
+- `CHECKPOINT_DB_PASSWORD`: that role's credential from the database administrator or credential store.
 
 Run with a stable work-item session ID: `agent.run(input, sessionId = workItemId)`.
 After an interruption, recreate the agent with the same graph, durable provider and

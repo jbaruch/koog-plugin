@@ -18,6 +18,9 @@ All notable changes to this plugin are documented here. Format: [Keep a Changelo
   tombstones are documented. The three checkpoint eval rubrics no longer reward
   nonexistent APIs or reject a valid automatic restart path. The fork task no
   longer supplies the nonexistent method names to both arms.
+- Migration guidance now uses the current checkpoint payload and replay APIs.
+  PostgreSQL settings include purpose/source documentation and variable-specific
+  error messages; fork validation errors identify the required serializer or graph.
 - Linked this repository to its Tessl project so future evals retain the same history.
 
 ### Validation
