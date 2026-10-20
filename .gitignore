@@ -1,8 +1,6 @@
 .DS_Store
 .idea/
-.vscode/
 *.iml
-.tessl/
 node_modules/
 .gradle/
 build/
